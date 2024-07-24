@@ -1,0 +1,68 @@
+CREATE TABLE IF NOT EXISTS Events (
+    event_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    date DATE,
+    time TIME,
+    location TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Users (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS Tickets (
+    ticket_id INTEGER PRIMARY KEY,
+    event_id INTEGER,
+    user_id INTEGER,
+    purchase_date DATE,
+    price REAL,
+    FOREIGN KEY (event_id) REFERENCES Events(event_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+--INSERT INTO Events (name, description, date, time, location) VALUES ('SQLite4 Announcement Party', 'Because 3 versions is not enough.', '2025-04-20', '10:00', 'SQL Arena');
+--SELECT * FROM Events;
+
+/*
+INSERT INTO Events (name, description, date, time, location) VALUES ('event1', 'talha party', '2024-06-20', '11:00', 'Talhas House');
+INSERT INTO Events (name, description, date, time, location) VALUES ('event2', 'talha celebration', '2024-08-25', '13:00', 'Tree House');
+INSERT INTO Events (name, description, date, time, location) VALUES ('event3', 'talha academy', '2024-08-25', '13:00', 'Alaska');
+
+INSERT INTO Users (username, password_hash, email) VALUES ('Talha', 'abc',  'talha@talha.com');
+INSERT INTO Users (username, password_hash, email) VALUES ('Talha1', 'abc',  'talha1@talha.com');
+INSERT INTO Users (username, password_hash, email) VALUES ('Talha 2', 'abcd',  'talha2@talha.com');
+
+INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (1, 1, '2024-08-2023', '50.50');
+INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (2, 1, '2024-08-2022', '100.00');
+INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (2, 3, '2024-08-2023', '25');
+INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (2, 1, '2024-08-2022', '70.00');
+INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (3, 1, '2024-08-2022', '1000.00');
+
+
+SELECT * from Events;
+SELECT * from Users;
+SELECT * from TICKETS;
+*/
+--INSERT INTO TICKETS (event_id, user_id, purchase_date, price) VALUES (3, 2, '2024-08-2022', '1060.00');
+--INSERT INTO Tickets (event_id, user_id, purchase_date, price, ) VALUES (123, 321, '2024-03-22', 15.50);
+/* Homework 1: Write a Query that returns all the tickets for a specifc user*/
+SELECT * from Tickets WHERE user_id = '1' AND event_id = '2';
+
+/*Homework 2: Write a Query that returns events between certain dates*/
+SELECT * from EVENTS where date > '2024-07-15' AND date < '2024-09-20';
+
+/* Homework 3: Write a Query that returns users who have spent more than $100.00 on tickets */
+
+SELECT DISTINCT Users.username from Users JOIN TICKETS where price >= 100;
+
+/* Homework 4: Get a leaderboard! In your test data, who has the most tickets? */
+SELECT Users.username AS 'name', COUNT(Tickets.user_id) AS 'tickets sold' from USERS INNER JOIN TICKETS ON Users.user_id=Tickets.user_id GROUP BY Users.username;
+--SELECT Users.username, COUNT(Tickets.user_id) from USERS INNER JOIN TICKETS ON Users.user_id=Tickets.user_id;
+
+/* Homework 5: Advanced: Write a single query that pulls every unique username in the database, 
+	and lists an aggregated value representing the total amount of money the user has spent on tickets */
+SELECT DISTINCT Users.username, SUM(price) AS 'aggregated value' from USERS JOIN TICKETS ON Users.user_id=Tickets.user_id GROUP BY Users.username;
