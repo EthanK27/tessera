@@ -17,7 +17,8 @@ import {
   ChakraProvider,
   Spacer,
   Grid,
-  GridItem
+  GridItem,
+  HStack
 } from "@chakra-ui/react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useColorModeValue } from '@chakra-ui/react';
@@ -85,16 +86,15 @@ function Login() {
     >
         <GridItem pl='2' area={'left'}>
         </GridItem>
-        <GridItem boxShadow="0 0 100px rgba(255, 255, 255, 1)" bg={color} area={'middle'}>
-            <Button as={Link} to={`/events`} variant='outline' textColor={textCol}>Go Back</Button>
-            <ChakraProvider theme={theme}>
-                <Container>
+        <GridItem boxShadow="0 0 100px rgba(255, 255, 255, 1)" bg={color} area={'middle'} >
+            <ChakraProvider theme={theme} alignItems="center" justifyContent="center" center="center">
+                <Container alignItems="center" justifyContent="center" center="center">
                     <Stack
                         flexDir="column"
                         mb="2"
                         justifyContent="center"
                         alignItems="center"
-                        height="700px" // need to fix this
+                        height="100vh"
                     >
                         <form>
                         <Box minW={{ base: "100%", md: "500px"}}>
@@ -162,18 +162,29 @@ function Login() {
                                         </Box>
                                     </Flex>
                                 </FormControl>
-                                <Button
-                                    borderRadius={0}
-                                    variant="outline"
-                                    color="blue.500"
-                                    width="full"
-                                    rounded='xl'
-                                    border='2px'
-                                    onClick={handleClick}
-                                    //as={Link} to={isValid ? `/events` : `/login`}
-                                >
-                                    Log in
-                                </Button>
+                                    <HStack>
+                                        <Button 
+                                            as={Link} to={`/events`} 
+                                            variant='outline' 
+                                            textColor={textCol}
+                                            borderRadius={0}
+                                            color="blue.500"
+                                            rounded='xl'
+                                            border='2px'
+                                        >Go Back</Button>
+                                        <Button
+                                            borderRadius={0}
+                                            variant="outline"
+                                            color="blue.500"
+                                            width="full"
+                                            rounded='xl'
+                                            border='2px'
+                                            onClick={handleClick}
+                                            //as={Link} to={isValid ? `/events` : `/login`}
+                                        >
+                                            Log in
+                                        </Button>
+                                    </HStack>
                                 </Stack>
                             </Stack>
                         </Box>

@@ -20,6 +20,7 @@ import {
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useColorModeValue } from '@chakra-ui/react';
 import { MdEmail } from "react-icons/md";
+import { AiFillPicture } from "react-icons/ai";
 import { Link, useNavigate } from 'react-router-dom';
 
 const CFaUserAlt = chakra(FaUserAlt);
@@ -41,6 +42,7 @@ function Register() {
   const [confirm_password, setConfirmPassword] = useState("");
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
+  const [profile_pic, setPfp] = useState("");
   const navigate = useNavigate();
 
   const bg = useColorModeValue('blue.500', 'blue.400');
@@ -62,6 +64,7 @@ function Register() {
                     last_name: last_name,
                     email: email,
                     username: username,
+                    profile_pic: profile_pic,
                     password: password,
                     confirm_password: confirm_password
                 }
@@ -102,7 +105,7 @@ function Register() {
                         mb="2"
                         justifyContent="center"
                         alignItems="center"
-                        height="700px" // need to fix this
+                        height="100vh"
                     >
                         <form>
                         <Box minW={{ base: "100%", md: "500px"}}>
@@ -118,34 +121,34 @@ function Register() {
                                 >
                                     <Heading padding={2} color={bg}>Sign Up</Heading>
                                     <HStack>
-                                        <FormControl>
+                                        <FormControl isRequired>
                                             <InputGroup>
                                                 <InputLeftElement
                                                     children={<CFaUserAlt />}
                                                 /> 
                                                 <Input 
                                                     boxShadow="xs"  
-                                                    placeholder="First name"
+                                                    placeholder="first name"
                                                     rounded='xl'
                                                     onChange={(e) => setFirstName(e.target.value)}
                                                 />
                                             </InputGroup>
                                         </FormControl>
-                                        <FormControl>
+                                        <FormControl isRequired>
                                             <InputGroup>
                                                 <InputLeftElement
                                                     children={<CFaUserAlt />}
                                                 />
                                                 <Input 
                                                     boxShadow="xs"  
-                                                    placeholder="Last name"
+                                                    placeholder="last name"
                                                     rounded='xl'
                                                     onChange={(e) => setLastName(e.target.value)}
                                                 />
                                             </InputGroup>
                                         </FormControl>
                                     </HStack>
-                                    <FormControl>
+                                    <FormControl isRequired>
                                         <InputGroup>
                                             <InputLeftElement
                                                 // pointerEvents="none"
@@ -159,7 +162,7 @@ function Register() {
                                             />
                                         </InputGroup>
                                     </FormControl>
-                                    <FormControl>
+                                    <FormControl isRequired>
                                         <InputGroup>
                                             <InputLeftElement
                                                 children={<MdEmail />}
@@ -173,6 +176,19 @@ function Register() {
                                         </InputGroup>
                                     </FormControl>
                                     <FormControl>
+                                        <InputGroup>
+                                            <InputLeftElement
+                                                children={<AiFillPicture />}
+                                            />
+                                            <Input 
+                                                boxShadow="xs"  
+                                                placeholder="profile picture (optional)"
+                                                rounded='xl'
+                                                onChange={(e) => setPfp(e.target.value)}
+                                            />
+                                        </InputGroup>
+                                    </FormControl>
+                                    <FormControl isRequired>
                                         <InputGroup>
                                             <InputLeftElement
                                                 pointerEvents="none"
@@ -198,9 +214,8 @@ function Register() {
                                                 </Button>
                                             </InputRightElement>
                                         </InputGroup>
-                                        
                                     </FormControl>
-                                    <FormControl>
+                                    <FormControl isRequired>
                                         <InputGroup>
                                             <InputLeftElement
                                                 pointerEvents="none"
@@ -228,17 +243,30 @@ function Register() {
                                         </InputGroup>
                                         
                                     </FormControl>
-                                    <Button
-                                        borderRadius={0}
-                                        variant="outline"
-                                        color="blue.500"
-                                        width="full"
-                                        rounded='xl'
-                                        border='2px'
-                                        onClick={handleClick}
-                                    >
-                                        Sign up
-                                    </Button>
+                                    <HStack>
+                                        <Button 
+                                            as={Link} to={`/login`} 
+                                            variant='outline' 
+                                            textColor={textCol}
+                                            borderRadius={0}
+                                            color="blue.500"
+                                            rounded='xl'
+                                            border='2px'
+                                        >
+                                            Go Back
+                                        </Button>
+                                        <Button
+                                            borderRadius={0}
+                                            variant="outline"
+                                            color="blue.500"
+                                            width="full"
+                                            rounded='xl'
+                                            border='2px'
+                                            onClick={handleClick}
+                                        >
+                                            Sign up
+                                        </Button>
+                                    </HStack>
                                 </Stack>
                             </Stack>    
                         </Box>

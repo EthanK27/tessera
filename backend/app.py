@@ -84,6 +84,7 @@ def create_user():
     confirm_password = request.json.get('confirm_password')
     first_name = request.json.get('first_name')
     last_name = request.json.get('last_name')
+    profile_pic = request.json.get('profile_pic')
 
     # Basic validation to ensure all fields are provided
     if not email or not username or not password or not confirm_password or not first_name or not last_name:
@@ -105,8 +106,8 @@ def create_user():
            return jsonify({'error': 'Passwords do not match'}), 401
         
         # Attempt to insert the new user into the Users table
-        cursor.execute('INSERT INTO Users (first_name, last_name, email, username, password_hash) VALUES (?, ?, ?, ?, ?)',
-                       (first_name, last_name, email, username, hashed_password))
+        cursor.execute('INSERT INTO Users (first_name, last_name, email, username, password_hash, profile_pic) VALUES (?, ?, ?, ?, ?, ?)',
+                       (first_name, last_name, email, username, hashed_password, profile_pic))
         conn.commit()  # Commit the changes to the database
 
         # Retrieve the user_id of the newly created user to confirm creation
