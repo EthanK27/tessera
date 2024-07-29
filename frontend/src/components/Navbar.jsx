@@ -34,7 +34,7 @@ function Navbar() {
               <MenuItem color={menuColor} as={Link} to={'/profile'}>Profile</MenuItem>
               <MenuItem color={menuColor}>Manage Tickets</MenuItem>
               <MenuItem color={menuColor}>Settings</MenuItem>    
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem color={menuColor}>Sign out</MenuItem>
               <MenuDivider></MenuDivider>    
               <MenuItem color={menuColor} as={Link} to={`/login`}>Log in</MenuItem>
             </MenuList>

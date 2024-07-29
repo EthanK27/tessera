@@ -2,7 +2,7 @@ import { Avatar, Box, Text, Card, Flex, HStack, TableContainer, Table, TableCapt
 import { useColorModeValue } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 
-function ProfileInfo({user_id, username, email, password_hash, first_name, last_name, profile_pic}) {
+function ProfileInfo({user_id, username, email, phone_number, password_hash, first_name, last_name, profile_pic}) {
     const bg = useColorModeValue('blue.500', 'blue.400');
     const color = useColorModeValue('white', 'gray.700');
     const textCol = useColorModeValue('gray.700', 'gray.300');
@@ -36,6 +36,10 @@ function ProfileInfo({user_id, username, email, password_hash, first_name, last_
                                 <Tr>
                                     <Td>Email Address</Td>
                                     <Td>{email}</Td>
+                                </Tr>
+                                <Tr>
+                                    <Td>Phone Number</Td>
+                                    <Td>{phone_number}</Td>
                                 </Tr>
                             </Tbody>
                         </Table>

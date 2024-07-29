@@ -42,6 +42,7 @@ function Register() {
   const [confirm_password, setConfirmPassword] = useState("");
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
+  const [phone_number, setPhoneNumber] = useState("");
   const [profile_pic, setPfp] = useState("");
   const navigate = useNavigate();
 
@@ -65,6 +66,7 @@ function Register() {
                     email: email,
                     username: username,
                     profile_pic: profile_pic,
+                    phone_number: phone_number,
                     password: password,
                     confirm_password: confirm_password
                 }
@@ -172,6 +174,19 @@ function Register() {
                                                 placeholder="email address"
                                                 rounded='xl'
                                                 onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                        </InputGroup>
+                                    </FormControl>
+                                    <FormControl isRequired>
+                                        <InputGroup>
+                                            <InputLeftElement
+                                                children={<MdEmail />}
+                                            />
+                                            <Input 
+                                                boxShadow="xs"  
+                                                placeholder="phone number"
+                                                rounded='xl'
+                                                onChange={(e) => setPhoneNumber(e.target.value)}
                                             />
                                         </InputGroup>
                                     </FormControl>

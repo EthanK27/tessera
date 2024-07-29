@@ -7,8 +7,11 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     create_refresh_token,
     get_jwt_identity, set_access_cookies,
-    set_refresh_cookies, unset_jwt_cookies, get_jwt
+    set_refresh_cookies, unset_jwt_cookies, get_jwt, unset_access_cookies
 )
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
@@ -85,10 +88,11 @@ def create_user():
     first_name = request.json.get('first_name')
     last_name = request.json.get('last_name')
     profile_pic = request.json.get('profile_pic')
+    phone_number = request.json.get('phone_number')
 
     # Basic validation to ensure all fields are provided
-    if not email or not username or not password or not confirm_password or not first_name or not last_name:
-        return jsonify({'error': 'All fields (email, username, first name, last name, password, and password confirmation) are required.'}), 400
+    if not email or not username or not password or not confirm_password or not first_name or not last_name or not phone_number:
+        return jsonify({'error': 'All fields (email, username, first name, last name, phone number, password, and password confirmation) are required.'}), 400
     
     if '@' in username:
        return jsonify({'error': 'Invalid character. Username can only contains letters and numbers'}), 400
@@ -106,8 +110,8 @@ def create_user():
            return jsonify({'error': 'Passwords do not match'}), 401
         
         # Attempt to insert the new user into the Users table
-        cursor.execute('INSERT INTO Users (first_name, last_name, email, username, password_hash, profile_pic) VALUES (?, ?, ?, ?, ?, ?)',
-                       (first_name, last_name, email, username, hashed_password, profile_pic))
+        cursor.execute('INSERT INTO Users (first_name, last_name, email, username, password_hash, profile_pic, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                       (first_name, last_name, email, username, hashed_password, profile_pic, phone_number))
         conn.commit()  # Commit the changes to the database
 
         # Retrieve the user_id of the newly created user to confirm creation
@@ -166,13 +170,13 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute('SELECT email, username, password_hash FROM Users WHERE email= ? OR username = ?', (userEmail, userEmail))
+        cursor.execute('SELECT email, username, user_id, password_hash FROM Users WHERE email= ? OR username = ?', (userEmail, userEmail))
         
         hashed = cursor.fetchone()
         conn.close()
         if hashed != None:
           if (check_password_hash(hashed['password_hash'], password)): 
-            payload = {"email": hashed[0], "username": hashed[1]}
+            payload = {"email": hashed[0], "username": hashed[1], "user_id": hashed[2]}
             expires = timedelta(days=14)
             access_token = create_access_token(identity=payload, expires_delta=expires)
 
@@ -226,38 +230,38 @@ def delete_user():
         return jsonify({'error': 'Username does not exist.'}), 409
   except Exception as e:
         return jsonify({'error': str(e)}), 500
-  
+
 # Change the users username and/or email 
-@app.route('/user/change/name', methods=['PUT'])
-def change_user_email():
-    username = request.json.get('username')
-    email = request.json.get('email')
+@app.route('/user/update/<user_id>', methods=['PUT'])
+def update_user(user_id):
     new_username = request.json.get('new_username')
     new_email = request.json.get('new_email')
+    new_phone_number = request.json.get('new_phone_number')
+    new_profile_pic = request.json.get('new_profile_pic')
     
-    if not username or not email:
-        return jsonify({'error': 'Username or email was not provided.'}), 400
+    if not new_username and not new_phone_number and not new_email and not new_profile_pic: 
+      return jsonify({'message': 'No new information provided'}), 400
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        if (new_username != None) and (new_email != None):
-          cursor.execute('UPDATE Users SET username = ?, email = ?', (new_username, new_email))
+        if new_username != "":
+          cursor.execute('UPDATE Users SET username = ? WHERE user_id = ?', (new_username, user_id,))
           conn.commit()
-        elif (new_username == None) and (new_email != None):
-            cursor.execute('UPDATE Users SET email = ?', (new_email,))
-            conn.commit()
-        elif (new_username != None) and (new_email == None):
-            cursor.execute('UPDATE Users SET username = ?', (new_username,))
-            conn.commit()
-        else:
-           return jsonify({'message': 'No new information provided'}), 404
-           
-        
+        if new_email != "":
+          cursor.execute('UPDATE Users SET email = ? WHERE user_id = ?', (new_email, user_id,))
+          conn.commit()
+        if new_phone_number != "":
+          cursor.execute('UPDATE Users SET phone_number = ? WHERE user_id = ?', (new_phone_number, user_id,))
+          conn.commit()
+        if new_profile_pic != "":
+          cursor.execute('UPDATE Users SET profile_pic = ? WHERE user_id = ?', (new_profile_pic, user_id,))
+          conn.commit()
+
         conn.close()
-        return jsonify({'message': 'Username and/or email successfully changed.'}), 201
-    
+      
+        return jsonify({'message': 'Username, email, profile picture, and/or phone number successfully changed.'}), 201
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -266,12 +270,12 @@ def change_user_email():
 @app.route('/user/password/change', methods=['PUT'])
 def change_password():
     # Retrieve information
-    username = request.json.get('username')
-    old_password = request.json.get('password')
+    check_username = request.json.get('check_username')
+    old_password = request.json.get('old_password')
     new_password = request.json.get('new_password')
 
     # Makes sure proper fields were provided to login
-    if not username or not old_password or not new_password:
+    if not check_username or not old_password or not new_password:
       return jsonify({'error': 'All fields (username, old password, and new password) are required'}), 400
 
     try:
@@ -279,12 +283,12 @@ def change_password():
       cursor = conn.cursor()
       
       # Retrieve the original password
-      cursor.execute('SELECT password_hash FROM Users WHERE username = ?', (username,))
+      cursor.execute('SELECT password_hash FROM Users WHERE username = ?', (check_username,))
       check_password = cursor.fetchone()
       hashed_password = generate_password_hash(new_password)
       if check_password != None:
         if (check_password_hash(check_password['password_hash'], old_password)):
-            cursor.execute('UPDATE Users SET password_hash = ? WHERE username = ?', (hashed_password, username,))
+            cursor.execute('UPDATE Users SET password_hash = ? WHERE username = ?', (hashed_password, check_username,))
             conn.commit()
         else:
             conn.close()
@@ -441,19 +445,18 @@ def lookupEventByEventID(eventId):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-
+# Get the information for the user currently logged in
 @app.route('/user/current', methods=['GET'])  
 @jwt_required()
 def getLoggedInUserInfo():
     jwt = get_jwt()
-    username = jwt['sub']['username']
+    user_id = jwt['sub']['user_id']
     
     try:
        conn = get_db_connection()
        cursor = conn.cursor()
 
-       cursor.execute('SELECT * FROM Users WHERE username = ?', (username,))
+       cursor.execute('SELECT * FROM Users WHERE user_id = ?', (user_id,))
        user = cursor.fetchall()
 
        user_info = [dict(u) for u in user]
