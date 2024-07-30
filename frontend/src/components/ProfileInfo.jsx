@@ -8,6 +8,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
     const textCol = useColorModeValue('gray.700', 'gray.300');
 
     return (
+        // Background
         <Box 
             padding="50px" 
             h="100vh" 
@@ -18,6 +19,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
         >    
             <HStack padding={3} justifyContent={'center'} spacing='10'>
             </HStack>
+            {/* Display the users information based on what was sent from the map */}
             <Box bg={color} center="center" justifyContent={'center'} rounded={30} h="70%" w="60%" padding={5}>
                 <Avatar size="2xl" mt={15} src={`${profile_pic}`}></Avatar>
                 <Card mt={20}>
@@ -45,7 +47,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
                         </Table>
                     </TableContainer>
                 </Card>
-                <Button mt={20}>Logout</Button>
+                <Button mt={20} >Logout</Button>
             </Box>
         </Box>
         

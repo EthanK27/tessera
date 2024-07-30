@@ -8,6 +8,7 @@ function ProfilePage() {
     // One tab for info, one to update info
     const [users, setUsers] = useState([]);
     
+    // Call to get logged in  users information
     useEffect(() => {
         fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
             credentials: 'include', 
@@ -16,7 +17,6 @@ function ProfilePage() {
         .then(setUsers)
         .catch(error => console.error('Error fetching profile:', error));
     }, []);
-    
     
     return (
         <Box>
@@ -30,6 +30,7 @@ function ProfilePage() {
                 </TabList>
                 <TabPanels>
                     <TabPanel>
+                        {/* Send info to display info component */}
                         {users.map(user => (
                             <ProfileInfo
                                 key={user.user_id}
@@ -45,7 +46,8 @@ function ProfilePage() {
                         ))}
                     </TabPanel>
                     <TabPanel>
-                    {users.map(user => (
+                        {/* Send info to update component */}
+                        {users.map(user => (
                             <UpdateProfile
                                 key={user.user_id}
                                 user_id={user.user_id}

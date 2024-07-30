@@ -26,6 +26,7 @@ import { FaUserAlt, FaLock } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import { AiFillPicture } from "react-icons/ai";
+import { GrUpdate } from "react-icons/gr";
 
 
 function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
@@ -40,6 +41,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
     const [new_phone_number, setPhoneNumber] = useState("");
     const [new_profile_pic, setProfilePic] = useState("");
 
+    // Call update endpoint when click button
     async function handleClick() {    
         fetch(`http://localhost:5000/user/update/${user_id}`, {
             method: 'PUT',
@@ -67,6 +69,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
     }
 
     return (
+        // Background
         <Box 
             padding="50px" 
             h="100vh" 
@@ -84,13 +87,14 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
                             flexDir="column"
                             mb="2"
                         >
+                            {/* Input section */}
                                 <form>
                                     <Stack mt={10}>
 
                                         <Heading mb={5} padding={2} color={bg}>Update User</Heading>
                                         <FormControl>
                                             <InputGroup mt={8}>
-                                                <InputLeftAddon bg={leftAddonCol} width="25%">Username: </InputLeftAddon>
+                                                <InputLeftAddon bg={leftAddonCol} width="28%">Username: </InputLeftAddon>
                                                 <InputRightElement
                                                     children={<FaUserAlt color="gray.300" />}
                                                 />
@@ -104,7 +108,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
                                         </FormControl>
                                         <FormControl>
                                             <InputGroup mt={8}>
-                                                <InputLeftAddon bg={leftAddonCol} width="25%">Email: </InputLeftAddon>
+                                                <InputLeftAddon bg={leftAddonCol} width="28%">Email: </InputLeftAddon>
                                                 <InputRightElement
                                                     children={<MdEmail color="gray.300" />}
                                                 />
@@ -118,7 +122,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
                                         </FormControl>
                                         <FormControl>
                                             <InputGroup mt={8}>
-                                                <InputLeftAddon bg={leftAddonCol} width="25%">Profile Picture: </InputLeftAddon>
+                                                <InputLeftAddon bg={leftAddonCol} width="28%">Profile Picture: </InputLeftAddon>
                                                 <InputRightElement
                                                     children={<AiFillPicture color="gray.300" />}
                                                 />
@@ -132,7 +136,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
                                         </FormControl>
                                         <FormControl>
                                             <InputGroup mt={8}>
-                                                <InputLeftAddon bg={leftAddonCol} width="25%">Phone Number: </InputLeftAddon>
+                                                <InputLeftAddon bg={leftAddonCol} width="28%">Phone Number: </InputLeftAddon>
                                                 <InputRightElement
                                                     children={<FaPhoneAlt color="gray.300" />}
                                                 />
@@ -148,7 +152,7 @@ function UpdateProfile({user_id,  first_name, last_name, profile_pic}) {
                                     </Stack>
                                 </form>
                                 
-                                <Button mt={20} color={bg} variant="outline" borderColor={bg} onClick={handleClick}>Update Info</Button>
+                                <Button mt={20} color={bg} variant="outline" borderColor={bg} onClick={handleClick} rightIcon={<GrUpdate />}>Update</Button>
                             
                         </Stack>
                     </Container>

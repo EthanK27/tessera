@@ -273,10 +273,14 @@ def change_password():
     check_username = request.json.get('check_username')
     old_password = request.json.get('old_password')
     new_password = request.json.get('new_password')
+    verify_password = request.json.get('verify_password')
 
     # Makes sure proper fields were provided to login
-    if not check_username or not old_password or not new_password:
-      return jsonify({'error': 'All fields (username, old password, and new password) are required'}), 400
+    if not check_username or not old_password or not new_password or not verify_password:
+      return jsonify({'error': 'All fields (username, old password, new password, and confirmation password) are required'}), 400
+    
+    if new_password != verify_password:
+       return jsonify({'error': 'Passwords do not match'}), 400
 
     try:
       conn = get_db_connection()
@@ -465,9 +469,65 @@ def getLoggedInUserInfo():
        return jsonify(user_info)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-       
-   
 
+# Create a price code 
+@app.route('/inventory/prices', methods=['POST'])
+def create_prices():
+   pricecode = request.json.get('pricecode')
+   event_id = request.json.get('event_id')
+   value = request.json.get('value')
+
+   if not pricecode or not event_id or not value:
+      return jsonify({'error': 'All fields (pricecode, event_id, and value) are required.'}), 400
+   
+   try:
+      conn = get_db_connection()
+      cursor = conn.cursor()
+      
+      cursor.execute('INSERT INTO Prices (pricecode, event_id, value) VALUES (?, ?, ?)', (pricecode, event_id, value,))
+      conn.commit()
+
+       # Retrieve the user_id of the newly created user to confirm creation
+      cursor.execute('SELECT price_id FROM Prices WHERE pricecode = ? AND event_id = ?', (pricecode, event_id,))
+      new_pricecode = cursor.fetchone()
+
+      conn.close()
+
+      return jsonify({'message': 'Pricecode created successfully', 'price_id': new_pricecode['price_id']}), 201
+
+   except sqlite3.IntegrityError:
+      return jsonify({'error': 'Pricecode already exists.'}), 409
+   except Exception as e:
+      return jsonify({'error': str(e)}), 500
+
+# Creates a ticket
+@app.route('/inventory/create', methods=['POST'])
+def create_ticket():
+   event_id = request.json.get('event_id')
+   row_name = request.json.get('row_name')
+   seat_number = request.json.get('seat_number')
+   status = request.json.get('status')
+   pricecode = request.json.get('pricecode')
+
+   if not event_id or not row_name or not seat_number or not status or not pricecode :
+      return jsonify({'error': 'All fields (event_id, row_name, seat_number, status, and pricecode) are required.'}), 400
+   
+   try:
+      conn = get_db_connection()
+      cursor = conn.cursor()
+
+      cursor.execute('INSERT INTO Tickets (event_id, row_name, seat_number, status, pricecode) VALUES (?, ?, ?, ?, ?)', (event_id, row_name, seat_number, status, pricecode,))
+      conn.commit()
+
+      conn.close()
+
+      return jsonify({'message': 'Ticket created successfully' }), 201
+
+   except sqlite3.IntegrityError:
+      return jsonify({'error': 'Ticket already exists.'}), 409
+   except Exception as e:
+      return jsonify({'error': str(e)}), 500
+   
 if __name__ == '__main__':
     app.run(debug=True)
     
