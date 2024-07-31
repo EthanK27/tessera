@@ -9,7 +9,7 @@ from flask_jwt_extended import (
     get_jwt_identity, set_access_cookies,
     set_refresh_cookies, unset_jwt_cookies, get_jwt, unset_access_cookies
 )
-from datetime import datetime
+from datetime import date
 from datetime import timedelta
 from datetime import timezone
 
@@ -506,11 +506,11 @@ def create_ticket():
    event_id = request.json.get('event_id')
    row_name = request.json.get('row_name')
    seat_number = request.json.get('seat_number')
-   status = request.json.get('status')
+   status = "AVAILABLE"
    pricecode = request.json.get('pricecode')
 
-   if not event_id or not row_name or not seat_number or not status or not pricecode :
-      return jsonify({'error': 'All fields (event_id, row_name, seat_number, status, and pricecode) are required.'}), 400
+   if not event_id or not row_name or not seat_number or not pricecode :
+      return jsonify({'error': 'All fields (event_id, row_name, seat_number, and pricecode) are required.'}), 400
    
    try:
       conn = get_db_connection()
@@ -528,6 +528,94 @@ def create_ticket():
    except Exception as e:
       return jsonify({'error': str(e)}), 500
    
+# Retrieve all the tickets (Doesn't display user_id or purchase_date)
+@app.route('/inventory', methods=['GET'])
+def get_tickets():
+    conn = get_db_connection()  # Establish database connection
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT event_id, row_name, seat_number, pricecode, status FROM Tickets')
+
+    tickets = cursor.fetchall()
+    tickets_list = [dict(ticket) for ticket in tickets]
+    
+    conn.close()  # Close the database connection
+    
+    return jsonify(tickets_list)  # Return the list of events as JSON
+
+# Retrieve tickets for a specific user
+@app.route('/inventory/<user_id>', methods=['GET'])
+def get_user_tickets(user_id):
+    conn = get_db_connection()  # Establish database connection
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT event_id, row_name, seat_number, pricecode FROM Tickets WHERE user_id = ?', (user_id,))
+
+    tickets = cursor.fetchall()
+    tickets_list = [dict(ticket) for ticket in tickets]
+    
+    conn.close()  # Close the database connection
+    
+    return jsonify(tickets_list)  # Return the list of events as JSON
+  
+# Reserve a ticket for a specific user
+@app.route('/inventory/reserve/<user_id>', methods=['PUT'])
+def reserve_ticket(user_id):
+   status = 'RESERVED'
+   event_id = request.json.get('event_id')
+   row_name = request.json.get('row_name')
+   seat_number = request.json.get('seat_number')
+   
+   try:
+      conn = get_db_connection()
+      cursor = conn.cursor()
+
+      cursor.execute('SELECT status FROM Tickets WHERE event_id = ? AND row_name = ? AND seat_number = ?', (event_id, row_name, seat_number,),)
+      check_status = cursor.fetchone()
+
+      if check_status['status'] == "AVAILABLE":
+        cursor.execute('UPDATE Tickets SET status = ?, user_id = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', (status, user_id, event_id, row_name, seat_number,),)
+        conn.commit()
+      else:
+         return jsonify({'error': 'Ticket is unavailable'}), 401
+
+      conn.close()
+      
+      return jsonify({'message': 'Ticket successfully reserved'}), 201
+    
+   except Exception as e:
+      return jsonify({'error': str(e)}), 500
+   
+# Updates the ticket when it is bought
+@app.route('/inventory/buy/<user_id>', methods=['PUT'])
+def buy_ticket(user_id):
+   status = 'SOLD'
+   purchase_date = str(date.today())
+   event_id = request.json.get('event_id')
+   row_name = request.json.get('row_name')
+   seat_number = request.json.get('seat_number')
+   
+   try:
+      conn = get_db_connection()
+      cursor = conn.cursor()
+
+      cursor.execute('SELECT status, user_id FROM Tickets WHERE event_id = ? AND row_name = ? AND seat_number = ?', (event_id, row_name, seat_number,),)
+      check_user = cursor.fetchone()
+
+      if int(check_user['user_id']) == int(user_id) and check_user['status'] == "RESERVED":
+        cursor.execute('UPDATE Tickets SET status = ?, purchase_date = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', (status, purchase_date, event_id, row_name, seat_number,),)
+        conn.commit()
+      else:
+        return jsonify({'error': 'Ticket is not reserved by current user'}), 401
+
+      conn.close()
+      
+      return jsonify({'message': 'Ticket successfully bought'}), 201
+    
+   except Exception as e:
+      return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     
