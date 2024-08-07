@@ -20,9 +20,16 @@ import {
   GridItem,
   HStack
 } from "@chakra-ui/react";
+import {
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
+} from '@chakra-ui/react'
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
+import { MdErrorOutline } from "react-icons/md";
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
@@ -40,6 +47,7 @@ function Login() {
     const navigate = useNavigate()
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isValid, setValidity] = useState(true)
 
     const bg = useColorModeValue('blue.500', 'blue.400');
     const color = useColorModeValue('white', 'gray.800');
@@ -65,6 +73,9 @@ function Login() {
             response => {
                 if (response.status == '200') {
                     navigate('/events')
+                }
+                else {
+                    setValidity(false)
                 }
             } 
         )
@@ -180,11 +191,18 @@ function Login() {
                                             rounded='xl'
                                             border='2px'
                                             onClick={handleClick}
-                                            //as={Link} to={isValid ? `/events` : `/login`}
+                                            
                                         >
                                             Log in
                                         </Button>
+                                        
                                     </HStack>
+                                    {isValid ? <></> : 
+                                        <Alert status='error' alignItems="center" justifyContent="center" center="center">
+                                            <AlertIcon />
+                                            <AlertDescription>The username and/or password you entered was incorrect. Please try again.</AlertDescription>
+                                      </Alert>
+                                    }
                                 </Stack>
                             </Stack>
                         </Box>

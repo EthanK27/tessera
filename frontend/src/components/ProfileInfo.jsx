@@ -1,11 +1,32 @@
 import { Avatar, Box, Text, Card, Flex, HStack, TableContainer, Table, TableCaption, Thead, Tr, Tbody, Td, Tfoot, Th, Wrap, WrapItem, Button } from "@chakra-ui/react";
 import { useColorModeValue } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { PiSignOutBold } from "react-icons/pi";
 
 function ProfileInfo({user_id, username, email, phone_number, password_hash, first_name, last_name, profile_pic}) {
     const bg = useColorModeValue('blue.500', 'blue.400');
     const color = useColorModeValue('white', 'gray.700');
     const textCol = useColorModeValue('gray.700', 'gray.300');
+    const navigate = useNavigate();
+
+    async function logout() {
+        fetch(`http://localhost:5000/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            
+            credentials: 'include', 
+        })
+        .then(
+            response => {
+                if (response.status == '200') {
+                    navigate('/login')
+                }
+        } )
+        .catch(error => console.error('Invalid Credentials:', error));
+    }
 
     return (
         // Background
@@ -47,7 +68,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
                         </Table>
                     </TableContainer>
                 </Card>
-                <Button mt={20} >Logout</Button>
+                <Button mt={20} leftIcon={<PiSignOutBold />} onClick={logout}>Sign Out</Button>
             </Box>
         </Box>
         

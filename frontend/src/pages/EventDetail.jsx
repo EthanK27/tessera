@@ -1,8 +1,9 @@
 import { useParams } from 'react-router-dom';
-import { Grid, } from '@chakra-ui/react';
+import { Grid, Box } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import SingleEvent from '../components/SingleEvent';
 import { useColorModeValue } from '@chakra-ui/react';
+
 
 function EventDetail() {
   const { id } = useParams(); 
@@ -18,8 +19,9 @@ function EventDetail() {
         .catch(error => console.error('Error fetching events:', error));
     }, []);
 
+
   return (
-    <Grid padding={5}>
+    <Box padding={5}>
       
         {events.map(event => (
           // Calls single event component and populates site with information for the event
@@ -34,7 +36,7 @@ function EventDetail() {
             imageUrl={event.url} 
           />
         ))}
-    </Grid>
+    </Box>
     
                 
   );
