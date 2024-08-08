@@ -41,7 +41,7 @@ function Navbar() {
         {/* Calls dark mode component */}
         <ColorChange/>
         {/*  Defaults light mode */}
-        
+
           {isLoggedIn == true ? <LoggedInMenu/> : <LoggedOutMenu/>}
 
       </Box>

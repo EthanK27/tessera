@@ -7,6 +7,23 @@ import { Link } from 'react-router-dom';
 function EventCard({ id, name, date, time, location, imageUrl }) {
   const [timeLeft, setTimeLeft] = useState('');
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
+    })
+      .then(response => {
+        if (response.status == 200) {
+            setIsLoggedIn(true)
+          }
+          else {
+            setIsLoggedIn(false)
+          }
+      })
+      
+      .catch(error => console.error('Error fetching profile:', error));
+  }, []);
+
   useEffect(() => {
     const updateTimer = () => {
       const eventDate = new Date(date + ' ' + time).getTime();
@@ -48,7 +65,7 @@ function EventCard({ id, name, date, time, location, imageUrl }) {
           <Text fontSize="sm">Event Time: {time}</Text>
           <Text fontSize="sm">Location: {location}</Text>
           <Text fontSize="sm" color="red.500">{timeLeft}</Text>
-          <Button colorScheme="blue" mt="4" as={Link} to={`/events/${id}`}>
+          <Button colorScheme="blue" mt="4" as={Link} to={isLoggedIn == true ? `/events/${id}` : `/login`}>
             Buy Tickets!
           </Button>
         </VStack>

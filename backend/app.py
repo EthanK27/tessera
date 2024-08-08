@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 )
 from datetime import date
 from datetime import timedelta
+import time
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
@@ -574,16 +575,28 @@ def reserve_ticket(user_id):
       if check_status['status'] == "AVAILABLE":
         cursor.execute('UPDATE Tickets SET status = ?, user_id = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', (status, user_id, event_id, row_name, seat_number,),)
         conn.commit()
+        countdown()
       else:
          return jsonify({'error': 'Ticket is unavailable'}), 401
 
       conn.close()
+      
       
       return jsonify({'message': 'Ticket successfully reserved'}), 201
     
    except Exception as e:
       return jsonify({'error': str(e)}), 500
    
+# Create class that acts as a countdown
+def countdown():
+ 
+   
+    time.sleep(10)
+ 
+
+
+    unreserve_ticket()
+
 # Updates the ticket when it is bought
 @app.route('/inventory/buy/<user_id>', methods=['PUT'])
 def buy_ticket(user_id):
@@ -631,6 +644,18 @@ def unreserve_ticket():
       return jsonify({'message': 'Ticket is no longer reserved'})
    except Exception as e:
       return jsonify({'error': str(e)}), 500
+
+@app.route('/inventory/seat/price/<event_id>/<row_name>/<seat_number>', methods=['GET'])
+def get_seat_price(event_id, row_name, seat_number):
+   conn = get_db_connection()  # Establish database connection
+   cursor = conn.cursor()
+
+   cursor.execute('SELECT value FROM Prices JOIN Tickets ON Tickets.pricecode = Prices.pricecode AND Tickets.event_id = Prices.event_id WHERE Tickets.event_id = ? AND Tickets.row_name = ? AND Tickets.seat_number = ?', (event_id, row_name, seat_number,))
+   prices = cursor.fetchone()
+  
+   conn.close()  # Close the database connection
+  
+   return jsonify(prices['value']) # Return the list of events as JSON
 
 if __name__ == '__main__':
     app.run(debug=True)

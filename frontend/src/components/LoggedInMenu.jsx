@@ -26,7 +26,9 @@ function LoggedInMenu() {
          .then( response => {
              if (response.status === 200)
                 {
-                    navigate(`/login`)}
+                    navigate(`/events`)
+                    location.reload(); 
+                }
            })
            
          .catch(error => console.error('Invalid Credentials:', error));

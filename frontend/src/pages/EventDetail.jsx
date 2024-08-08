@@ -3,6 +3,7 @@ import { Grid, Box } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import SingleEvent from '../components/SingleEvent';
 import { useColorModeValue } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 
 function EventDetail() {
@@ -10,6 +11,7 @@ function EventDetail() {
   const [events, setEvents] = useState([]);
   const bg = useColorModeValue('blue.500', 'blue.400');
   const color = useColorModeValue('white', 'gray.800');
+  const navigate = useNavigate();
 
   // Get corresponding event page based on id
     useEffect(() => {

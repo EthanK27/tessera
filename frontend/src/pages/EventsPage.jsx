@@ -18,6 +18,7 @@ function EventsPage() {
     setAfterDateFromFilter(afterDate);
     setBeforeDateFromFilter(beforeDate);
   }
+
 // Fetches the endpoint to refresh the page
   useEffect(() => {
 
