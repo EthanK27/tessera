@@ -1,4 +1,4 @@
-import { Menu, MenuButton, MenuList, MenuItem, MenuItemOption, MenuGroup, MenuOptionGroup, MenuDivider} from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItem, MenuItemOption, MenuGroup, MenuOptionGroup, MenuDivider } from '@chakra-ui/react';
 import { useColorModeValue } from '@chakra-ui/react';
 import { Box, Flex, Text, Button, Spacer, LightMode } from '@chakra-ui/react';
 import { CgProfile } from "react-icons/cg";
@@ -13,11 +13,11 @@ function LoggedOutMenu() {
 
     return (
         <Menu bg={bg} color={color}>
-        {/* Profile button. Opens Menu */}
-        <Button as={Link} to={`/login`} bg={bg} color={color} leftIcon={<CgProfile />} colorScheme="blue" size='lg'>
-          Profile
-        </Button>
-      </Menu>
+            {/* Profile button. Opens Menu */}
+            <Button as={Link} to={`/login`} bg={bg} color={color} leftIcon={<CgProfile />} colorScheme="blue" size='lg'>
+                Profile
+            </Button>
+        </Menu>
     );
 }
 export default LoggedOutMenu;

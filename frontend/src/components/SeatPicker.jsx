@@ -3,13 +3,12 @@ import TesseraSeatPicker from 'tessera-seat-picker';
 import { Grid, Box, Text, Button } from '@chakra-ui/react';
 
 
-function SeatPicker({ event_id, user_id }) {
+function SeatPicker({ event_id, user_id, priceCb }) {
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(true);
   const [seats, setSeats] = useState([]);
   const [rows, setRows] = useState([]);
-  const [reservedPrice, setReservedPrice] = useState(0.0);
-  const [seatPrice, setSeatPrice] = useState(0.0);
+  var reserved = "";
 
   // Grabs the data for the seats
   useEffect(() => {
@@ -31,13 +30,14 @@ function SeatPicker({ event_id, user_id }) {
     fetchData();
   }, [event_id]);
 
+  
 
-    useEffect(() => {
+  useEffect(() => {
     if (seats.length > 0) {
       const newRows = Object.values(
         seats.reduce((acc, curr) => {
           // Puts the information into the proper format so the map can be populated in the front end
-          const seat_info = {id: curr.row_name + curr.seat_number, number: curr.seat_number, isReserved: curr.status !== 'AVAILABLE', tooltip: String('$' + curr.value)};
+          const seat_info = { id: curr.row_name + curr.seat_number, number: curr.seat_number, isReserved: curr.status !== 'AVAILABLE', tooltip: String('$' + curr.value) };
           // If the row doesn't exist yet, create it
           if (!acc[curr.row_name]) {
             // Add the seat info into the newly created row
@@ -51,39 +51,9 @@ function SeatPicker({ event_id, user_id }) {
       );
       // Update the rows state 
       setRows(newRows);
-      setLoading(false); 
+      setLoading(false);
     }
   }, [seats]);
-
-  const addPrice = async ({row, number}) => {
-    await fetch(`http://localhost:5000/inventory/seat/price/${event_id}/${row}/${number}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include', 
-    })
-    .then(response => response.json()) 
-    .then(price => {
-      setReservedPrice(reservedPrice + price);
-    })
-    .catch(error => console.error('Unable to reserve seat', error));
-  }
-
-  const subtractPrice = async ({row, number}) => {
-    await fetch(`http://localhost:5000/inventory/seat/price/${event_id}/${row}/${number}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include', 
-    })
-    .then(response => response.json()) 
-    .then(price => {
-      setReservedPrice(reservedPrice - price);
-    })
-    .catch(error => console.error('Unable to reserve seat', error));
-  }
 
 
 
@@ -92,30 +62,29 @@ function SeatPicker({ event_id, user_id }) {
     setLoading(true);
 
     try {
-      
-        // Your custom logic to reserve the seat goes here...
+
+      // Your custom logic to reserve the seat goes here...
       fetch(`http://localhost:5000/inventory/reserve/${user_id}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify (
-              {
-                  event_id: event_id,
-                  row_name: row,
-                  seat_number: number
-              }
-          ),
-          credentials: 'include', 
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          {
+            event_id: event_id,
+            row_name: row,
+            seat_number: number
+          }
+        ),
+        credentials: 'include',
       })
-      .then(response => response.json()) 
-      .catch(error => console.error('Unable to reserve seat', error));
+        .then(response => response.json())
+        .catch(error => console.error('Unable to reserve seat', error));
       // debugger
-      addPrice({row, number});
       
-      
-      console.log(reservedPrice)
-   
+
+      reserved = "true";
+      priceCb({ row, number, reserved });
       // Assuming everything went well...
       setSelected((prevItems) => [...prevItems, id]);
       const updateTooltipValue = 'Added to cart';
@@ -127,7 +96,6 @@ function SeatPicker({ event_id, user_id }) {
       console.error('Error adding seat:', error);
     } finally {
       setLoading(false);
-      // setReservedPrice(reservedPrice + seatPrice)
     }
   };
 
@@ -136,21 +104,21 @@ function SeatPicker({ event_id, user_id }) {
 
     try {
       fetch(`http://localhost:5000/inventory/unreserve`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify (
-              {
-                  event_id: event_id,
-                  row_name: row,
-                  seat_number: number
-              }
-          ),
-          credentials: 'include', 
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          {
+            event_id: event_id,
+            row_name: row,
+            seat_number: number
+          }
+        ),
+        credentials: 'include',
       })
-      .then(response => response.json()) 
-      .catch(error => console.error('Unable to unreserve seat', error));
+        .then(response => response.json())
+        .catch(error => console.error('Unable to unreserve seat', error));
 
       setSelected((list) => list.filter((item) => item !== id));
       removeCb(row, number);
@@ -160,31 +128,29 @@ function SeatPicker({ event_id, user_id }) {
     } finally {
       setLoading(false);
     }
-
-    subtractPrice({row, number});
+    reserved = "false";
+    priceCb({ row, number, reserved });
   };
 
   return (
     //.. A bunch of other stuff...
-    <Box bg="orange" minW={{ base: "100%", md: "500px"}} minH={{ base: "100%", md: "500px"}}>
+    <Box minW={{ base: "100%", md: "500px" }} minH={{ base: "100%", md: "500px" }}>
       <TesseraSeatPicker
-      addSeatCallback={addSeatCallback}
-      removeSeatCallback={removeSeatCallback}
-      rows={rows}
-      maxReservableSeats={3}
-      alpha
-      visible
-      loading={loading}
+        addSeatCallback={addSeatCallback}
+        removeSeatCallback={removeSeatCallback}
+        rows={rows}
+        maxReservableSeats={3}
+        alpha
+        visible
+        loading={loading}
       />
-      <Box mt={40} ml={10}>Price: ${reservedPrice}</Box>
-      <Button mt={10} ml={10}>Checkout</Button>
     </Box>
-    
+
   );
 }
 
 export default SeatPicker;
-
+// Seat picker knows which seat go picked. In Single Event make functino that accepts seat location. Then eventDetails can do calculation to get 
 //Backend
 // setTimeout(c) => {
 //     ...

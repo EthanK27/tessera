@@ -19,10 +19,10 @@ function EventsPage() {
     setBeforeDateFromFilter(beforeDate);
   }
 
-// Fetches the endpoint to refresh the page
+  // Fetches the endpoint to refresh the page
   useEffect(() => {
 
-    fetch(`http://localhost:5000/events?name=${name}&location=${location}&afterDate=${afterDate}&beforeDate=${beforeDate}`) 
+    fetch(`http://localhost:5000/events?name=${name}&location=${location}&afterDate=${afterDate}&beforeDate=${beforeDate}`)
       .then(response => response.json())
       .then(setEvents)
       .catch(error => console.error('Error fetching events:', error));
@@ -32,7 +32,7 @@ function EventsPage() {
   return (
     <Container maxW="container.xl" centerContent>
       {/* Call to Filter Component. Sends the data from the search bars to the component */}
-      <Filter sendDataToParent={handleDataFromChild}/>
+      <Filter sendDataToParent={handleDataFromChild} />
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={10} py={5}>
         {events.map(event => (
           // Call of the Event Card component to place each event with corresponding info
@@ -43,12 +43,12 @@ function EventsPage() {
             date={event.date}
             time={event.time}
             location={event.location}
-            imageUrl={event.url} 
+            imageUrl={event.url}
           />
         ))}
       </SimpleGrid>
     </Container>
-    
+
   );
 }
 

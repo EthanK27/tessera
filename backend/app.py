@@ -12,12 +12,14 @@ from flask_jwt_extended import (
 from datetime import date
 from datetime import timedelta
 import time
+import stripe
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_SECRET_KEY'] = 'banana_pudding'
 CORS(app, supports_credentials=True)
 jwt = JWTManager(app)
+
 
 # This function returns a connection to the database which can be u ed to send SQL commands to the database
 def get_db_connection():
@@ -591,7 +593,7 @@ def reserve_ticket(user_id):
 def countdown():
  
    
-    time.sleep(10)
+    time.sleep(300)
  
 
 
@@ -600,24 +602,20 @@ def countdown():
 # Updates the ticket when it is bought
 @app.route('/inventory/buy/<user_id>', methods=['PUT'])
 def buy_ticket(user_id):
-   status = 'SOLD'
    purchase_date = str(date.today())
    event_id = request.json.get('event_id')
-   row_name = request.json.get('row_name')
-   seat_number = request.json.get('seat_number')
    
    try:
       conn = get_db_connection()
       cursor = conn.cursor()
 
-      cursor.execute('SELECT status, user_id FROM Tickets WHERE event_id = ? AND row_name = ? AND seat_number = ?', (event_id, row_name, seat_number,),)
-      check_user = cursor.fetchone()
+      # cursor.execute('SELECT status, user_id FROM Tickets WHERE event_id = ? AND row_name = ? AND seat_number = ?', (event_id),)
+      # check_user = cursor.fetchone()
+      # print(check_user)
 
-      if int(check_user['user_id']) == int(user_id) and check_user['status'] == "RESERVED":
-        cursor.execute('UPDATE Tickets SET status = ?, purchase_date = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', (status, purchase_date, event_id, row_name, seat_number,),)
-        conn.commit()
-      else:
-        return jsonify({'error': 'Ticket is not reserved by current user'}), 401
+
+      cursor.execute('UPDATE Tickets SET status = \'SOLD\', purchase_date = ? WHERE event_id = ? AND status = \'RESERVED\' AND user_id = ?', (purchase_date, event_id, user_id),)
+      conn.commit()
 
       conn.close()
       
@@ -637,7 +635,7 @@ def unreserve_ticket():
       conn = get_db_connection()
       cursor = conn.cursor()
       
-      cursor.execute('UPDATE Tickets SET status = ?, user_id = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', ( 'AVAILABLE', None, event_id, row_name, seat_number,),)
+      cursor.execute('UPDATE Tickets SET status = \'AVAILABLE\', user_id = ? WHERE event_id = ? AND row_name = ? AND seat_number = ? AND status = \'RESERVED\'', ( None, event_id, row_name, seat_number,),)
       conn.commit()
 
       conn.close()
@@ -657,6 +655,49 @@ def get_seat_price(event_id, row_name, seat_number):
   
    return jsonify(prices['value']) # Return the list of events as JSON
 
+# Get your key from your dashboard
+stripe.api_key = 'sk_test_51PlwJLHqBfXkID6mQxxIsD7ZnHQnVp6rEQCkJevqw4wHxScqWnUec19xXYvQC0Mo3tyTUeItc8qDSpsp4k83KxoM00GFcmTZnz'
+stripe.verify_ssl_certs = False
+
+@app.route('/create-payment-intent', methods=['POST'])
+def create_payment_intent():
+    try:
+        data = request.json
+        amount = data['amount']  # Amount in cents
+        
+        # More Docs: https://docs.stripe.com/api/payment_intents/create
+        payment_intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency='usd'
+        )
+
+        return jsonify({
+            'clientSecret': payment_intent['client_secret']
+        })
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+
+@app.route('/complete-purchase/', methods=['POST'])
+def complete_purchase():
+    try:
+        data = request.json
+        payment_intent_id = data['paymentIntentId']
+        seats = data['seats']
+        
+        # More Docs: https://docs.stripe.com/api/payment_intents/retrieve
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        if payment_intent.status != 'succeeded':
+            return jsonify({"error": "Payment not successful"}), 400
+        ### This is where you should process the sale
+        ### Remember everything you need to assign seats to an account
+        ### You'll probably need more inputs
+        ### Create functions to help you with this! Break up your code
+
+        return jsonify({"message": "Purchase completed successfully"})
+    
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
     

@@ -7,17 +7,17 @@ function ProfilePage() {
     // profile information, tickets, maybe credit card info   
     // One tab for info, one to update info
     const [users, setUsers] = useState([]);
-    
+
     // Call to get logged in  users information
     useEffect(() => {
-        fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
-            credentials: 'include', 
+        fetch(`http://localhost:5000/user/current`, { credentials: 'include' }, {
+            credentials: 'include',
         })
-        .then(response => response.json())
-        .then(setUsers)
-        .catch(error => console.error('Error fetching profile:', error));
+            .then(response => response.json())
+            .then(setUsers)
+            .catch(error => console.error('Error fetching profile:', error));
     }, []);
-    
+
     return (
         <Box>
             <Tabs isFitted>
@@ -62,24 +62,24 @@ function ProfilePage() {
                         ))}
                     </TabPanel>
                     <TabPanel>
-                    {users.map(user => (
-                        <ChangePassword
-                        key={user.user_id}
-                            user_id={user.user_id}
-                            username={user.username}
-                            email={user.email}
-                            phone_number={user.phone_number}
-                            password_hash={user.password_hash}
-                            first_name={user.first_name}
-                            last_name={user.last_name}
-                            profile_pic={user.profile_pic}
-                        />
-                    ))}
+                        {users.map(user => (
+                            <ChangePassword
+                                key={user.user_id}
+                                user_id={user.user_id}
+                                username={user.username}
+                                email={user.email}
+                                phone_number={user.phone_number}
+                                password_hash={user.password_hash}
+                                first_name={user.first_name}
+                                last_name={user.last_name}
+                                profile_pic={user.profile_pic}
+                            />
+                        ))}
                     </TabPanel>
                 </TabPanels>
             </Tabs>
         </Box>
     );
-    
+
 }
 export default ProfilePage;

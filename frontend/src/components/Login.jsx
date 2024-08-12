@@ -1,24 +1,24 @@
 import { useState } from "react";
 import {
-  Flex,
-  Heading,
-  Input,
-  Button,
-  InputGroup,
-  Stack,
-  InputLeftElement,
-  chakra,
-  Box,
-  FormControl,
-  FormHelperText,
-  InputRightElement, 
-  Container,
-  extendTheme,
-  ChakraProvider,
-  Spacer,
-  Grid,
-  GridItem,
-  HStack
+    Flex,
+    Heading,
+    Input,
+    Button,
+    InputGroup,
+    Stack,
+    InputLeftElement,
+    chakra,
+    Box,
+    FormControl,
+    FormHelperText,
+    InputRightElement,
+    Container,
+    extendTheme,
+    ChakraProvider,
+    Spacer,
+    Grid,
+    GridItem,
+    HStack
 } from "@chakra-ui/react";
 import {
     Alert,
@@ -55,166 +55,166 @@ function Login() {
     const butCol = useColorModeValue('gray.200', 'gray.700');
     const textCol = useColorModeValue('gray.700', 'gray.300');
 
-    async function handleClick() {    
+    async function handleClick() {
         await fetch(`http://localhost:5000/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify (
+            body: JSON.stringify(
                 {
                     userEmail: userEmail,
                     password: password
                 }
             ),
-            credentials: 'include', 
+            credentials: 'include',
         })
-        .then(
-            response => {
-                if (response.status == '200') {
-                    navigate('/events')
+            .then(
+                response => {
+                    if (response.status == '200') {
+                        navigate('/events')
+                    }
+                    else {
+                        setValidity(false)
+                    }
                 }
-                else {
-                    setValidity(false)
-                }
-            } 
-        )
-        .catch(error => console.error('Invalid Credentials:', error));
+            )
+            .catch(error => console.error('Invalid Credentials:', error));
     }
 
-  return (
-    <Grid
-        templateAreas={`"left middle right"`}
-        gridTemplateRows={'100v'}
-        gridTemplateColumns={'100v'}
-        height='100vh'
-        color='blackAlpha.700'
-        fontWeight='bold'
-        textColor={textCol}
-        backgroundImage={'https://www.shutterstock.com/image-photo/close-shot-crowd-pov-mode-600nw-2304001181.jpg'}
-        backgroundRepeat={'no-repeat'}
-        backgroundSize='cover'
-    >
-        <GridItem pl='2' area={'left'}>
-        </GridItem>
-        <GridItem boxShadow="0 0 100px rgba(255, 255, 255, 1)" bg={color} area={'middle'} >
-            <ChakraProvider theme={theme} alignItems="center" justifyContent="center" center="center">
-                <Container alignItems="center" justifyContent="center" center="center">
-                    <Stack
-                        flexDir="column"
-                        mb="2"
-                        justifyContent="center"
-                        alignItems="center"
-                        height="100vh"
-                    >
-                        <form>
-                        <Box minW={{ base: "100%", md: "500px"}}>
-                            <Stack boxShadow="base" border={border} borderWidth={1} rounded="lg" padding={5}>
-                                <Stack
-                                    spacing={3}
-                                    p="3rem"
-                                    backgroundColor={color}
-                                    boxShadow="xs"
-                                    border={border}
-                                    borderWidth={1}
-                                    rounded='lg'
-                                >
-                                <Heading padding={2} color={bg}>Login</Heading>
-                                <FormControl>
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            children={<CFaUserAlt color="gray.300" />}
-                                        />
-                                        <Input 
-                                            boxShadow="xs"  
-                                            placeholder="username or email"
-                                            rounded='xl'
-                                            onChange={(e) => setUserEmail(e.target.value)}
-                                        />
-                                    </InputGroup>
-                                </FormControl>
-                                <FormControl>
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            pointerEvents="none"
-                                            textColor={textCol}
-                                            children={<CFaLock color="gray.300" />}
-                                        />
-                                            <Input 
-                                                rounded='xl' 
-                                                type={showPassword ? "text" : "password"} 
-                                                boxShadow="xs" 
-                                                placeholder="password"
-                                                onChange={(e) => setPassword(e.target.value)}
-                                            />
-                                        <InputRightElement width="4.5rem">
-                                            <Button 
-                                                h="1.75rem" 
-                                                bg={butCol} 
-                                                color={textCol}
-                                                size="sm" 
-                                                onClick={handleShowClick}>
-                                                    {showPassword ? "Hide" : "Show"}
-
-                                            </Button>
-                                        </InputRightElement>
-                                    </InputGroup>
-                                    <Flex>
-                                        <Box>
-                                            <FormHelperText textAlign="left">
-                                                <Link size={'sm'}>Forgot password?</Link>
-                                            </FormHelperText>
-                                        </Box>
-                                    <Spacer/>
-                                        <Box>
-                                            <FormHelperText textAlign="right">
-                                                <Link as={Link} to='/register' size={'sm'}>New? Sign up</Link>
-                                            </FormHelperText>
-                                        </Box>
-                                    </Flex>
-                                </FormControl>
-                                    <HStack>
-                                        <Button 
-                                            as={Link} to={`/events`} 
-                                            variant='outline' 
-                                            textColor={textCol}
-                                            borderRadius={0}
-                                            color="blue.500"
-                                            rounded='xl'
-                                            border='2px'
-                                        >Go Back</Button>
-                                        <Button
-                                            borderRadius={0}
-                                            variant="outline"
-                                            color="blue.500"
-                                            width="full"
-                                            rounded='xl'
-                                            border='2px'
-                                            onClick={handleClick}
-                                            
+    return (
+        <Grid
+            templateAreas={`"left middle right"`}
+            gridTemplateRows={'100v'}
+            gridTemplateColumns={'100v'}
+            height='100vh'
+            color='blackAlpha.700'
+            fontWeight='bold'
+            textColor={textCol}
+            backgroundImage={'https://www.shutterstock.com/image-photo/close-shot-crowd-pov-mode-600nw-2304001181.jpg'}
+            backgroundRepeat={'no-repeat'}
+            backgroundSize='cover'
+        >
+            <GridItem pl='2' area={'left'}>
+            </GridItem>
+            <GridItem boxShadow="0 0 100px rgba(255, 255, 255, 1)" bg={color} area={'middle'} >
+                <ChakraProvider theme={theme} alignItems="center" justifyContent="center" center="center">
+                    <Container alignItems="center" justifyContent="center" center="center">
+                        <Stack
+                            flexDir="column"
+                            mb="2"
+                            justifyContent="center"
+                            alignItems="center"
+                            height="100vh"
+                        >
+                            <form>
+                                <Box minW={{ base: "100%", md: "500px" }}>
+                                    <Stack boxShadow="base" border={border} borderWidth={1} rounded="lg" padding={5}>
+                                        <Stack
+                                            spacing={3}
+                                            p="3rem"
+                                            backgroundColor={color}
+                                            boxShadow="xs"
+                                            border={border}
+                                            borderWidth={1}
+                                            rounded='lg'
                                         >
-                                            Log in
-                                        </Button>
-                                        
-                                    </HStack>
-                                    {isValid ? <></> : 
-                                        <Alert status='error' alignItems="center" justifyContent="center" center="center">
-                                            <AlertIcon />
-                                            <AlertDescription>The username and/or password you entered was incorrect. Please try again.</AlertDescription>
-                                      </Alert>
-                                    }
-                                </Stack>
-                            </Stack>
-                        </Box>
-                        </form>
-                    </Stack>
-                </Container>
-            </ChakraProvider>
-        </GridItem>
-        <GridItem pl='2' area={'right'}>
-        </GridItem>
+                                            <Heading padding={2} color={bg}>Login</Heading>
+                                            <FormControl>
+                                                <InputGroup>
+                                                    <InputLeftElement
+                                                        children={<CFaUserAlt color="gray.300" />}
+                                                    />
+                                                    <Input
+                                                        boxShadow="xs"
+                                                        placeholder="username or email"
+                                                        rounded='xl'
+                                                        onChange={(e) => setUserEmail(e.target.value)}
+                                                    />
+                                                </InputGroup>
+                                            </FormControl>
+                                            <FormControl>
+                                                <InputGroup>
+                                                    <InputLeftElement
+                                                        pointerEvents="none"
+                                                        textColor={textCol}
+                                                        children={<CFaLock color="gray.300" />}
+                                                    />
+                                                    <Input
+                                                        rounded='xl'
+                                                        type={showPassword ? "text" : "password"}
+                                                        boxShadow="xs"
+                                                        placeholder="password"
+                                                        onChange={(e) => setPassword(e.target.value)}
+                                                    />
+                                                    <InputRightElement width="4.5rem">
+                                                        <Button
+                                                            h="1.75rem"
+                                                            bg={butCol}
+                                                            color={textCol}
+                                                            size="sm"
+                                                            onClick={handleShowClick}>
+                                                            {showPassword ? "Hide" : "Show"}
 
-    </Grid>
-  );
+                                                        </Button>
+                                                    </InputRightElement>
+                                                </InputGroup>
+                                                <Flex>
+                                                    <Box>
+                                                        <FormHelperText textAlign="left">
+                                                            <Link size={'sm'}>Forgot password?</Link>
+                                                        </FormHelperText>
+                                                    </Box>
+                                                    <Spacer />
+                                                    <Box>
+                                                        <FormHelperText textAlign="right">
+                                                            <Link as={Link} to='/register' size={'sm'}>New? Sign up</Link>
+                                                        </FormHelperText>
+                                                    </Box>
+                                                </Flex>
+                                            </FormControl>
+                                            <HStack>
+                                                <Button
+                                                    as={Link} to={`/events`}
+                                                    variant='outline'
+                                                    textColor={textCol}
+                                                    borderRadius={0}
+                                                    color="blue.500"
+                                                    rounded='xl'
+                                                    border='2px'
+                                                >Go Back</Button>
+                                                <Button
+                                                    borderRadius={0}
+                                                    variant="outline"
+                                                    color="blue.500"
+                                                    width="full"
+                                                    rounded='xl'
+                                                    border='2px'
+                                                    onClick={handleClick}
+
+                                                >
+                                                    Log in
+                                                </Button>
+
+                                            </HStack>
+                                            {isValid ? <></> :
+                                                <Alert status='error' alignItems="center" justifyContent="center" center="center">
+                                                    <AlertIcon />
+                                                    <AlertDescription>The username and/or password you entered was incorrect. Please try again.</AlertDescription>
+                                                </Alert>
+                                            }
+                                        </Stack>
+                                    </Stack>
+                                </Box>
+                            </form>
+                        </Stack>
+                    </Container>
+                </ChakraProvider>
+            </GridItem>
+            <GridItem pl='2' area={'right'}>
+            </GridItem>
+
+        </Grid>
+    );
 };
 export default Login;

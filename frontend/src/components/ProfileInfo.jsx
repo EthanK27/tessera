@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PiSignOutBold } from "react-icons/pi";
 
-function ProfileInfo({user_id, username, email, phone_number, password_hash, first_name, last_name, profile_pic}) {
+function ProfileInfo({ user_id, username, email, phone_number, password_hash, first_name, last_name, profile_pic }) {
     const bg = useColorModeValue('blue.500', 'blue.400');
     const color = useColorModeValue('white', 'gray.700');
     const textCol = useColorModeValue('gray.700', 'gray.300');
@@ -16,28 +16,28 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
             headers: {
                 'Content-Type': 'application/json',
             },
-            
-            credentials: 'include', 
+
+            credentials: 'include',
         })
-        .then(
-            response => {
-                if (response.status == '200') {
-                    navigate('/login')
-                }
-        } )
-        .catch(error => console.error('Invalid Credentials:', error));
+            .then(
+                response => {
+                    if (response.status == '200') {
+                        navigate('/login')
+                    }
+                })
+            .catch(error => console.error('Invalid Credentials:', error));
     }
 
     return (
         // Background
-        <Box 
-            padding="50px" 
-            h="100vh" 
-            align="center" 
+        <Box
+            padding="50px"
+            h="100vh"
+            align="center"
             backgroundRepeat={"no-repeat"}
             backgroundSize={'cover'}
             backgroundImage="https://img.freepik.com/premium-photo/colorful-mountain-landscape-with-pink-sky-clouds_664601-5865.jpg"
-        >    
+        >
             <HStack padding={3} justifyContent={'center'} spacing='10'>
             </HStack>
             {/* Display the users information based on what was sent from the map */}
@@ -50,7 +50,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
                                 <Tr>
                                     <Td>Name</Td>
                                     <Td>{first_name} {last_name}</Td>
-                                    
+
                                 </Tr>
                                 <Tr>
                                     <Td>Username</Td>
@@ -71,7 +71,7 @@ function ProfileInfo({user_id, username, email, phone_number, password_hash, fir
                 <Button mt={20} leftIcon={<PiSignOutBold />} onClick={logout}>Sign Out</Button>
             </Box>
         </Box>
-        
+
     );
 }
 export default ProfileInfo;

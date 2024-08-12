@@ -1,28 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Text, VStack, Heading, LinkBox, Button } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // function EventCard(props) {
 // props.id, props.name
 function EventCard({ id, name, date, time, location, imageUrl }) {
   const [timeLeft, setTimeLeft] = useState('');
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
-    })
-      .then(response => {
-        if (response.status == 200) {
-            setIsLoggedIn(true)
-          }
-          else {
-            setIsLoggedIn(false)
-          }
-      })
-      
-      .catch(error => console.error('Error fetching profile:', error));
-  }, []);
+  async function redirect() {
+        fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
+        })
+          .then(response => {
+            if (response.status == 200) {
+                navigate(`/events/${id}`)
+              }
+              else {
+                navigate(`/login`)
+              }
+          })
+          
+          .catch(error => console.error('Error fetching profile:', error));
+  }
+  
 
   useEffect(() => {
     const updateTimer = () => {
@@ -65,7 +66,7 @@ function EventCard({ id, name, date, time, location, imageUrl }) {
           <Text fontSize="sm">Event Time: {time}</Text>
           <Text fontSize="sm">Location: {location}</Text>
           <Text fontSize="sm" color="red.500">{timeLeft}</Text>
-          <Button colorScheme="blue" mt="4" as={Link} to={isLoggedIn == true ? `/events/${id}` : `/login`}>
+          <Button colorScheme="blue" mt="4" onClick={redirect} >
             Buy Tickets!
           </Button>
         </VStack>
