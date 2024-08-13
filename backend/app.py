@@ -13,6 +13,9 @@ from datetime import date
 from datetime import timedelta
 import time
 import stripe
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
@@ -26,6 +29,33 @@ def get_db_connection():
   conn = sqlite3.connect('../database/tessera.db')
   conn.row_factory = sqlite3.Row
   return conn
+
+def send_email(to_email, subject, body):
+    # Gmail account credentials
+    from_email = 'ekemprowspam@gmail.com'
+    from_password = 'vbsx fdgg xtxs atvg'  
+
+    # Setup the MIME
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    # Attach the email body
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to the Gmail SMTP server
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()  # Secure the connection
+        server.login(from_email, from_password)  
+        text = msg.as_string()  # Convert the message to a string
+        server.sendmail(from_email, to_email, text)  # Send the email
+        server.quit()  # Close the connection
+        print(f"Email sent to {to_email} successfully.")
+    except Exception as e:
+        print(f"Failed to send email. Error: {e}")
+
 
 # When asked, add code in this area
 @app.route('/events', methods=['GET'])
@@ -207,24 +237,29 @@ def logout():
 def delete_user():
   # Extract usernamefrom the JSON payload
   username = request.json.get('username')
+  password = request.json.get('password')
 
   # Basic validation to ensure all fields are provided
-  if not username:
-      return jsonify({'error': 'Username is required to delete account.'}), 400
+  if not username or not password:
+      return jsonify({'error': 'Username and password are required to delete account.'}), 400
   
   try:
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    found_user = cursor.execute('SELECT username FROM Users WHERE username = ?', (username,))
-    
+    cursor.execute('SELECT username, password_hash FROM Users WHERE username = ?', (username,))
+    found_user = cursor.fetchone()
 
     
     if (found_user != None):
-      cursor.execute('DELETE FROM Users WHERE username = ?', (username,))
-      conn.commit()
-      conn.close()
-      return jsonify({'message': 'User successfully deleted'}), 201
+      if (check_password_hash(found_user['password_hash'], password)):
+        cursor.execute('DELETE FROM Users WHERE username = ?', (username,))
+        conn.commit()
+        conn.close()
+        logout()
+        return jsonify({'message': 'User successfully deleted'}), 201
+      else:
+        return jsonify({'message': 'Password is incorrect'}), 404
     conn.close()
     return jsonify({'error': 'Username not found.'}), 404
   
@@ -545,12 +580,13 @@ def get_tickets(event_id):
     return jsonify(tickets_list)  # Return the list of events as JSON
 
 # Retrieve tickets for a specific user
-@app.route('/inventory/<user_id>', methods=['GET'])
+@app.route('/inventory/user/<user_id>', methods=['GET'])
+@jwt_required()
 def get_user_tickets(user_id):
     conn = get_db_connection()  # Establish database connection
     cursor = conn.cursor()
 
-    cursor.execute('SELECT event_id, row_name, seat_number, pricecode FROM Tickets WHERE user_id = ?', (user_id,))
+    cursor.execute('SELECT event_id, row_name, seat_number, pricecode, purchase_date FROM Tickets WHERE user_id = ? AND status = \'SOLD\'', (user_id,))
 
     tickets = cursor.fetchall()
     tickets_list = [dict(ticket) for ticket in tickets]
@@ -591,12 +627,7 @@ def reserve_ticket(user_id):
    
 # Create class that acts as a countdown
 def countdown():
- 
-   
     time.sleep(300)
- 
-
-
     unreserve_ticket()
 
 # Updates the ticket when it is bought
@@ -604,20 +635,27 @@ def countdown():
 def buy_ticket(user_id):
    purchase_date = str(date.today())
    event_id = request.json.get('event_id')
+   to_email = request.json.get('to_email')
+   subject = request.json.get('subject')
+   body = request.json.get('body')
    
    try:
       conn = get_db_connection()
       cursor = conn.cursor()
 
-      # cursor.execute('SELECT status, user_id FROM Tickets WHERE event_id = ? AND row_name = ? AND seat_number = ?', (event_id),)
-      # check_user = cursor.fetchone()
-      # print(check_user)
+      cursor.execute('SELECT row_name, seat_number FROM Tickets WHERE user_id = ? AND status = \'RESERVED\' AND event_id = ?', (user_id, event_id))
 
+      tickets = cursor.fetchall()
+      tickets_list = [dict(ticket) for ticket in tickets]
+      formatted_list = [f"{ticket['row_name']}{ticket['seat_number']}" for ticket in tickets_list]
+      final_tickets = ', '.join(formatted_list)
 
       cursor.execute('UPDATE Tickets SET status = \'SOLD\', purchase_date = ? WHERE event_id = ? AND status = \'RESERVED\' AND user_id = ?', (purchase_date, event_id, user_id),)
       conn.commit()
 
+      send_email(to_email, subject, body + 'Your ticket(s) are ' + final_tickets)
       conn.close()
+
       
       return jsonify({'message': 'Ticket successfully bought'}), 201
     

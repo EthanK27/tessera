@@ -51,23 +51,6 @@ function SingleEvent({ id, name, description, date, time, location, imageUrl }) 
       .catch(error => console.error('Unable to reserve seat', error));
   }
 
-  const checkout = async () => {
-    await fetch(`http://localhost:5000/inventory/buy/${user.user_id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(
-        {
-          event_id: id
-        }
-      ),
-      credentials: 'include',
-    })
-      .then(response => response.json())
-      .catch(error => console.error('Unable to purchase tickets', error));
-  }
-
   return (
       <Grid
       templateAreas={`"header header header button"
@@ -119,19 +102,12 @@ function SingleEvent({ id, name, description, date, time, location, imageUrl }) 
             <ModalBody>
               {
                 user ?
-                  <PaymentForm totalAmount={reservedPrice} event_id={id} user_id={user.user_id}/>
+                  <PaymentForm totalAmount={reservedPrice} event_id={id} user_id={user.user_id} event_name={name}/>
 
                 : null
               }
               
             </ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme='blue' mr={3} onClick={onClose}>
-                Close
-              </Button>
-              <Button variant='ghost'>Pay</Button>
-            </ModalFooter>
           </ModalContent>
         </Modal>
       </GridItem>

@@ -7,6 +7,7 @@ import EventDetail from './pages/EventDetail';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage'
 import ProfilePage from './pages/ProfilePage'
+import TicketsPage from './pages/TicketsPage'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/profile" element={<ProfilePage />}></Route>
+          <Route path="/tickets" element={<TicketsPage />}></Route>
         </Routes>
     </>
   )

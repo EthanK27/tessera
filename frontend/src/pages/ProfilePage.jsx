@@ -7,6 +7,7 @@ function ProfilePage() {
     // profile information, tickets, maybe credit card info   
     // One tab for info, one to update info
     const [users, setUsers] = useState([]);
+    
 
     // Call to get logged in  users information
     useEffect(() => {
@@ -17,6 +18,7 @@ function ProfilePage() {
             .then(setUsers)
             .catch(error => console.error('Error fetching profile:', error));
     }, []);
+
 
     return (
         <Box>

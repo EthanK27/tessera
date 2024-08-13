@@ -44,7 +44,7 @@ function LoggedInMenu() {
             <MenuList minWidth='240px'>
                 {/* Profile part of menu takes you to login if not logged in */}
                 <MenuItem color={textColor} as={Link} to={'/profile'}>Profile</MenuItem>
-                <MenuItem color={textColor}>Manage Tickets</MenuItem>
+                <MenuItem color={textColor} as={Link} to={'/tickets'}>Manage Tickets</MenuItem>
                 <MenuItem color={textColor}>Settings</MenuItem>
                 <MenuDivider></MenuDivider>
                 <MenuItem color={textColor} onClick={clickLogout}>Sign Out</MenuItem>

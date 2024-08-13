@@ -143,6 +143,8 @@ function SeatPicker({ event_id, user_id, priceCb }) {
         alpha
         visible
         loading={loading}
+        seatStyle={{ backgroundColor: 'orange', borderRadius: '5px'}} 
+        stageStyle={{ backgroundColor: 'darkred' }} 
       />
     </Box>
 
@@ -150,11 +152,3 @@ function SeatPicker({ event_id, user_id, priceCb }) {
 }
 
 export default SeatPicker;
-// Seat picker knows which seat go picked. In Single Event make functino that accepts seat location. Then eventDetails can do calculation to get 
-//Backend
-// setTimeout(c) => {
-//     ...
-// }, 5
-// How to run python code every 5 minutes?
-
-// Add another component so we can pass in all the prices into and then we can call that component into the grid in the pag
