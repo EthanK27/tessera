@@ -1,29 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, VStack, Heading, LinkBox, Button } from '@chakra-ui/react';
+import { Image, Text, VStack, Heading, LinkBox, Button, useDisclosure } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react'
 
 // function EventCard(props) {
 // props.id, props.name
 function EventCard({ id, name, date, time, location, imageUrl }) {
   const [timeLeft, setTimeLeft] = useState('');
+  const [eventStarted, setEventStarted] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const navigate = useNavigate();
 
+  // Redirects the user if they are/aren't logged in
   async function redirect() {
-        fetch(`http://localhost:5000/user/current`, {credentials:'include'}, {
-        })
-          .then(response => {
-            if (response.status == 200) {
-                navigate(`/events/${id}`)
-              }
-              else {
-                navigate(`/login`)
-              }
-          })
-          
-          .catch(error => console.error('Error fetching profile:', error));
+    fetch(`http://localhost:5000/user/current`, { credentials: 'include' }, {
+    })
+      .then(response => {
+        if (response.status == 200) {
+          if (eventStarted == false) {
+            navigate(`/events/${id}`)
+          }
+          else {
+            setShowAlert(true);
+            onOpen();
+          }
+        }
+        else {
+          navigate(`/login`)
+        }
+      })
+
+      .catch(error => console.error('Error fetching profile:', error));
   }
-  
 
   useEffect(() => {
     const updateTimer = () => {
@@ -34,9 +52,10 @@ function EventCard({ id, name, date, time, location, imageUrl }) {
       // Checks if event has already started
       if (distance < 0) {
         setTimeLeft('Event has started');
+        setEventStarted(true);
         return;
       }
-      
+
       // Converts time to useable format
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -61,14 +80,27 @@ function EventCard({ id, name, date, time, location, imageUrl }) {
           <Image borderRadius="md" src={imageUrl} alt={`Image for ${name}`} objectFit="cover" width="full" />
         )}
         <VStack align="stretch" p="4">
-        <Heading size="md" my="2">{name}</Heading>
+          <Heading size="md" my="2">{name}</Heading>
           <Text fontSize="sm">Date: {date}</Text>
           <Text fontSize="sm">Event Time: {time}</Text>
           <Text fontSize="sm">Location: {location}</Text>
           <Text fontSize="sm" color="red.500">{timeLeft}</Text>
-          <Button colorScheme="blue" mt="4" onClick={redirect} >
+          <Button colorScheme="blue" mt="4" onClick={redirect}>
             Buy Tickets!
           </Button>
+          {showAlert ?
+            <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} isCentered>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Event has Ended</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody padding={10}>
+                  This event has ended. Please select a different event.
+                </ModalBody>
+                <ModalFooter/>
+              </ModalContent>
+            </Modal> : <></>
+          }
         </VStack>
       </VStack>
     </LinkBox>

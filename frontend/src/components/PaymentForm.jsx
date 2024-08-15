@@ -27,6 +27,7 @@ const CheckoutForm = ({ totalAmount, user_id, event_id, event_name }) => {
 
     const cardElement = elements.getElement(CardElement);
 
+    // Payment intent to connect with stripe
     const response = await fetch('http://localhost:5000/create-payment-intent', {
       method: 'POST',
       headers: {
@@ -47,7 +48,7 @@ const CheckoutForm = ({ totalAmount, user_id, event_id, event_name }) => {
     });
 
 
-
+    // Purchases tickets. Also sends an email to the given address. Will navigate to the user's tickets upon completion
     async function buyTickets() {
       fetch(`http://localhost:5000/inventory/buy/${user_id}`, {
         method: 'PUT',
@@ -117,6 +118,7 @@ const CheckoutForm = ({ totalAmount, user_id, event_id, event_name }) => {
   );
 };
 
+// Gets information like price calculations from parent component (callback) and sends it to this component 
 const PaymentForm = ({ totalAmount, user_id, event_id, event_name }) => (
   <Elements stripe={stripePromise}>
     <CheckoutForm totalAmount={totalAmount} user_id={user_id} event_id={event_id} event_name={event_name} />

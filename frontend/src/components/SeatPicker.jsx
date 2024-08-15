@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TesseraSeatPicker from 'tessera-seat-picker';
-import { Grid, Box, Text, Button } from '@chakra-ui/react';
+import { Grid, Box, Text, Button, Card } from '@chakra-ui/react';
+import '../style.css';
 
 
 function SeatPicker({ event_id, user_id, priceCb }) {
@@ -30,7 +31,6 @@ function SeatPicker({ event_id, user_id, priceCb }) {
     fetchData();
   }, [event_id]);
 
-  
 
   useEffect(() => {
     if (seats.length > 0) {
@@ -62,7 +62,7 @@ function SeatPicker({ event_id, user_id, priceCb }) {
     setLoading(true);
 
     try {
-
+      reserved = "true";
       // Your custom logic to reserve the seat goes here...
       fetch(`http://localhost:5000/inventory/reserve/${user_id}`, {
         method: 'PUT',
@@ -82,8 +82,6 @@ function SeatPicker({ event_id, user_id, priceCb }) {
         .catch(error => console.error('Unable to reserve seat', error));
       // debugger
       
-
-      reserved = "true";
       priceCb({ row, number, reserved });
       // Assuming everything went well...
       setSelected((prevItems) => [...prevItems, id]);
@@ -101,6 +99,7 @@ function SeatPicker({ event_id, user_id, priceCb }) {
 
   const removeSeatCallback = async ({ row, number, id }, removeCb) => {
     setLoading(true);
+    reserved = "false";
 
     try {
       fetch(`http://localhost:5000/inventory/unreserve`, {
@@ -128,7 +127,6 @@ function SeatPicker({ event_id, user_id, priceCb }) {
     } finally {
       setLoading(false);
     }
-    reserved = "false";
     priceCb({ row, number, reserved });
   };
 
@@ -143,8 +141,8 @@ function SeatPicker({ event_id, user_id, priceCb }) {
         alpha
         visible
         loading={loading}
-        seatStyle={{ backgroundColor: 'orange', borderRadius: '5px'}} 
-        stageStyle={{ backgroundColor: 'darkred' }} 
+        containerClassName="custom-container"
+        stageClassName="custom-stage"
       />
     </Box>
 

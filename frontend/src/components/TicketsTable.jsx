@@ -4,6 +4,7 @@ import { Table, TableContainer, Tr, Td, Tbody, Thead, Th } from '@chakra-ui/reac
 function TicketsTable({ event_id, row_name, seat_number, purchase_date }) {
     const [event, setEvent] = useState([]);
     
+    // Gets the event information to print
     useEffect(() => {
         fetch(`http://localhost:5000/events/${event_id}`, {
             credentials: 'include'
@@ -14,6 +15,7 @@ function TicketsTable({ event_id, row_name, seat_number, purchase_date }) {
     }, []);
 
     return (
+        // Individual ticket
         <Tr>
             <Td>{event.name}</Td>
             <Td>{event.date}</Td>

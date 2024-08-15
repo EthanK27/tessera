@@ -33,7 +33,7 @@ def get_db_connection():
 def send_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password = 'vbsx fdgg xtxs atvg'  
+    from_password =  
 
     # Setup the MIME
     msg = MIMEMultipart()
@@ -56,6 +56,31 @@ def send_email(to_email, subject, body):
     except Exception as e:
         print(f"Failed to send email. Error: {e}")
 
+def send_password_email(to_email, subject, body):
+    # Gmail account credentials
+    from_email = 'ekemprowspam@gmail.com'
+    from_password = 'wgqd popm zsou ktbp'  
+
+    # Setup the MIME
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    # Attach the email body
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to the Gmail SMTP server
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()  # Secure the connection
+        server.login(from_email, from_password)  
+        text = msg.as_string()  # Convert the message to a string
+        server.sendmail(from_email, to_email, text)  # Send the email
+        server.quit()  # Close the connection
+        print(f"Email sent to {to_email} successfully.")
+    except Exception as e:
+        print(f"Failed to send email. Error: {e}")
 
 # When asked, add code in this area
 @app.route('/events', methods=['GET'])
@@ -368,6 +393,23 @@ def forgot_password():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Allows users to change their password after forgetting it
+@app.route('/user/password/forgot/email', methods=['PUT'])
+def email_forgot_password():
+    # Retrieve information
+    email = request.json.get('email')
+
+    # Makes sure proper fields were provided to update password
+    if not email:
+      return jsonify({'error': 'All fields (email) are required'}), 400
+
+    try:
+      send_password_email(email, 'Tessera Password Change', 'change password here: http://localhost:5173/forgotpass') # We'll need to deploy and get an actual link for this to work i think
+      return jsonify({'message': 'Email sent successfully'}), 201
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
 # Allows event creation
 @app.route('/events/create', methods=['POST'])
@@ -378,7 +420,7 @@ def create_event():
   event_time = request.json.get('event_time')
   event_date = request.json.get('event_date')
   event_description = request.json.get('event_description')
-  event_url = request.json.get('url')
+  event_url = request.json.get('event_url')
 
   # Ensure all fields are put in
   if not event_name or not event_location or not event_time or not event_date or not event_description or not event_url:
@@ -618,7 +660,6 @@ def reserve_ticket(user_id):
          return jsonify({'error': 'Ticket is unavailable'}), 401
 
       conn.close()
-      
       
       return jsonify({'message': 'Ticket successfully reserved'}), 201
     

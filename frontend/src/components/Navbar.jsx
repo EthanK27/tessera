@@ -15,6 +15,7 @@ function Navbar() {
   const menuColor = useColorModeValue('gray.600', 'gray.800');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Gets current users info. If logged in, use the proper navbar
   useEffect(() => {
     fetch(`http://localhost:5000/user/current`, { credentials: 'include' }, {
     })

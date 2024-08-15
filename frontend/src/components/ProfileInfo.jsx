@@ -136,6 +136,7 @@ function ProfileInfo({ user_id, username, email, phone_number, password_hash, fi
                     <Button mt={20} leftIcon={<PiSignOutBold />} onClick={logout}>Sign Out</Button>
                     <Button mt={20} leftIcon={<TiUserDeleteOutline />} onClick={onOpen} bg={deleteUserButton}>Delete User</Button>
 
+                    {/* Deleting user */}
                     <Modal isOpen={isOpen} onClose={onClose} isCentered>
                         <ModalOverlay />
                         <ModalContent>

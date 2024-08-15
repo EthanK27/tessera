@@ -11,6 +11,7 @@ function Tickets({ user_id }) {
     const [tickets, setTickets] = useState([]);
     const color = useColorModeValue('white', 'gray.700');
 
+    // Gets all the tickets for the current user
     useEffect(() => {
         fetch(`http://localhost:5000/inventory/user/${user_id}`, {
             credentials: 'include'
@@ -35,7 +36,7 @@ function Tickets({ user_id }) {
                         </HStack>
 
                         <Card rounded='5px' boxShadow={'5px'} overflowY="auto" overflowX="auto" maxHeight="400px" overflow='auto' >
-
+                            {/* Allows scrolling in the tickets table */}
                             <TableContainer overflowY="auto" overflowX="auto" >
                                 <Table variant='simple' colorScheme='teal' overflowX="unset" overflowY="unset">
                                     <Thead overflowX="unset" overflowY="unset" position="sticky" top={0} z-index="sticky" x-index='sticky'>
@@ -48,6 +49,7 @@ function Tickets({ user_id }) {
                                         </Tr>
                                     </Thead>
                                     <Tbody>
+                                        {/* Map for each individual ticket */}
                                         {tickets.map(ticket => (
                                             <TicketsTable
                                                 key={ticket.event_id + ticket.row_name + ticket.seat_number}

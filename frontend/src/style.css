@@ -1,0 +1,35 @@
+.custom-container {
+    margin-top: 40px;
+    font-size: 15px;
+  }
+  
+  .custom-stage {
+    background-color: light-dark(#616161, #9E9E9E);
+    width: 70%;
+    text-align: center;
+    padding: 5px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+  }
+
+.seat {
+    /* background-color: lightskyblue !important; */
+    height: 70px !important;
+    width: 70px !important;
+}
+
+.seat-picker__row__number {
+    color: light-dark(#616161, #E0E0E0) !important;
+    
+}
+
+.seat__number {
+    font-size: 12px !important;
+}
+
+.seat-picker__row--enabled:hover {
+    background-color: transparent !important;
+}
+.seat-picker__row--selected {
+    background-color: transparent !important;
+}

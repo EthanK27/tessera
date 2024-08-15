@@ -26,10 +26,20 @@ import {
     AlertTitle,
     AlertDescription,
 } from '@chakra-ui/react'
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+} from '@chakra-ui/react'
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useColorModeValue } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdErrorOutline } from "react-icons/md";
+import { useDisclosure } from '@chakra-ui/react'
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
@@ -48,6 +58,8 @@ function Login() {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isValid, setValidity] = useState(true)
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [email, setEmail] = useState("");
 
     const bg = useColorModeValue('blue.500', 'blue.400');
     const color = useColorModeValue('white', 'gray.800');
@@ -55,6 +67,7 @@ function Login() {
     const butCol = useColorModeValue('gray.200', 'gray.700');
     const textCol = useColorModeValue('gray.700', 'gray.300');
 
+    // Login endpoint. Activates if login button is clicked
     async function handleClick() {
         await fetch(`http://localhost:5000/login`, {
             method: 'POST',
@@ -80,6 +93,22 @@ function Login() {
                 }
             )
             .catch(error => console.error('Invalid Credentials:', error));
+    }
+
+    async function forgotPassword() {
+        await fetch(`http://localhost:5000/password/user/password/forgot/email`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                {
+                    email: email,
+                }
+            ),
+        })
+        .then(response => response.json())
+        .catch(error => console.error('Invalid email:', error));
     }
 
     return (
@@ -162,7 +191,34 @@ function Login() {
                                                 <Flex>
                                                     <Box>
                                                         <FormHelperText textAlign="left">
-                                                            <Link size={'sm'}>Forgot password?</Link>
+                                                            <Link size={'sm'} onClick={onOpen}>
+                                                                Forgot password?
+                                                                <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
+                                                                    <ModalOverlay />
+                                                                    <ModalContent>
+                                                                        <ModalHeader>Cart</ModalHeader>
+                                                                        <ModalCloseButton />
+                                                                        <ModalBody>
+                                                                            <FormControl>
+                                                                                <InputGroup>
+                                                                                    <InputLeftElement
+                                                                                        children={<CFaUserAlt color="gray.300" />}
+                                                                                    />
+                                                                                    <Input
+                                                                                        boxShadow="xs"
+                                                                                        placeholder="email"
+                                                                                        rounded='xl'
+                                                                                        onChange={(e) => setEmail(e.target.value)}
+                                                                                    />
+                                                                                </InputGroup>
+                                                                            </FormControl>
+                                                                        </ModalBody>
+                                                                        <Button mt={4} colorScheme="blue" type="submit" onClick={forgotPassword}>
+                                                                            Reset Password
+                                                                        </Button>
+                                                                    </ModalContent>
+                                                                </Modal>
+                                                            </Link>
                                                         </FormHelperText>
                                                     </Box>
                                                     <Spacer />

@@ -13,7 +13,7 @@ function TicketsPage() {
             credentials: 'include',
         })
             .then(response => response.json())
-            .then(user => { setUser(user[0]) })
+            .then(user => { setUser(user[0])})
             .catch(error => console.error('Error fetching profile:', error));
     }, []);
     return (
