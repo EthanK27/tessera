@@ -33,7 +33,7 @@ def get_db_connection():
 def send_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password =  
+    from_password =  ''
 
     # Setup the MIME
     msg = MIMEMultipart()
