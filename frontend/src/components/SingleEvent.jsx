@@ -23,7 +23,7 @@ import TicketsReserved from './TicketsReserved';
 
 // function EventCard(props) {
 // props.id, props.name
-function SingleEvent({ id, name, description, date, time, location, imageUrl }) {
+function SingleEvent({ id, name, description, date, time, location, imageUrl, category }) {
   const bg = useColorModeValue('blue.500', 'blue.400');
   const color = useColorModeValue('white', 'gray.800');
   const [user, setUser] = useState(null);

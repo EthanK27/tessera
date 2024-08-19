@@ -13,7 +13,7 @@ import {
 
 // function EventCard(props) {
 // props.id, props.name
-function EventCard({ id, name, date, time, location, imageUrl }) {
+function EventCard({ id, name, date, time, location, imageUrl, category }) {
   const [timeLeft, setTimeLeft] = useState('');
   const [eventStarted, setEventStarted] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -92,10 +92,10 @@ function EventCard({ id, name, date, time, location, imageUrl }) {
             <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} isCentered>
               <ModalOverlay />
               <ModalContent>
-                <ModalHeader>Event has Ended</ModalHeader>
+                <ModalHeader>Event has Started</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody padding={10}>
-                  This event has ended. Please select a different event.
+                  This event has already started. Please select a different event.
                 </ModalBody>
                 <ModalFooter/>
               </ModalContent>

@@ -7,6 +7,8 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import { FaLocationDot } from "react-icons/fa6";
 import { useState } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
+import { Select } from '@chakra-ui/react'
+
 
 function Filter({ sendDataToParent }) {
     const bg = useColorModeValue('blue.500', 'blue.400');
@@ -19,20 +21,27 @@ function Filter({ sendDataToParent }) {
     const [location, setLocationFromFilter] = useState("");
     const [afterDate, setAfterDateFromFilter] = useState("");
     const [beforeDate, setBeforeDateFromFilter] = useState("");
+    const [category, setCategoryFromFilter] = useState("");
 
     // Helper to send data back to the page/parent function
     function handleClick() {
-        sendDataToParent(name, location, afterDate, beforeDate);
+        sendDataToParent(name, location, afterDate, beforeDate, category);
     }
     // Same thing but sends empty data to reset
     // Also deletes what was in the filter boxes
     function clearFilters() {
-        sendDataToParent("", "", "", "");
+        sendDataToParent("", "", "", "", "");
         setNameFromFilter('');
         setLocationFromFilter('');
         setAfterDateFromFilter('');
         setBeforeDateFromFilter('');
+        setCategoryFromFilter('');
     }
+
+	const handleSelectChange = (event) => {
+		const selectedValue = event.target.value;
+		setCategoryFromFilter(selectedValue);
+	};
 
     return (
         // Drop down aspect of the filter
@@ -50,38 +59,48 @@ function Filter({ sendDataToParent }) {
                 </h2>
 
                 <AccordionPanel pb={4}>
-                    <FormControl >
-                        <HStack divider={<StackDivider borderColor='gray.200' />} spacing={4} align='stretch'>
-                            {/* Date part of filter */}
-                            <InputGroup>
-                                <Input placeholder='Select Date and Time' size='md' type='date' value={afterDate} onChange={(e) => setAfterDateFromFilter(e.target.value)} />
-                                <>_</>
-                                <Input placeholder='Select Date and Time' size='md' type='date' value={beforeDate} onChange={(e) => setBeforeDateFromFilter(e.target.value)} />
-                            </InputGroup>
+                    <HStack divider={<StackDivider borderColor='gray.200' />} spacing={4} align='stretch'>
+                        <Select placeholder='Select Category' width='3xs' onChange={handleSelectChange} value={category}>
+                            <option value='Sports'>Sports</option>
+                            <option value='Music'>Music</option>
+                            <option value='Shows'>Shows</option>
+                        </Select>
+                        <FormControl >
+                            <HStack divider={<StackDivider borderColor='gray.200' />} spacing={4} align='stretch'>
+                                {/* Date part of filter */}
 
-                            {/* Location part of filter */}
-                            <InputGroup>
-                                <InputLeftElement>
-                                    <FaLocationDot />
-                                </InputLeftElement>
-                                <Input color={textColor} bg={color} placeholder='Search by Location' _placeholder={{ color: { placeholderColor } }} type="text" value={location} onChange={(e) => setLocationFromFilter(e.target.value)} />
-                            </InputGroup>
+                                <InputGroup>
+                                    <Input placeholder='Select Date and Time' size='md' type='date' value={afterDate} onChange={(e) => setAfterDateFromFilter(e.target.value)} />
+                                    <>_</>
+                                    <Input placeholder='Select Date and Time' size='md' type='date' value={beforeDate} onChange={(e) => setBeforeDateFromFilter(e.target.value)} />
+                                </InputGroup>
 
-                            {/* Name part of filter */}
-                            <InputGroup>
-                                <InputLeftElement>
-                                    <FaMagnifyingGlass />
-                                </InputLeftElement>
-                                <Input color={textColor} bg={color} placeholder='Search by Name' _placeholder={{ color: { placeholderColor } }} type="text" value={name} onChange={(e) => setNameFromFilter(e.target.value)} />
-                            </InputGroup>
+                                {/* Location part of filter */}
+                                <InputGroup>
+                                    <InputLeftElement>
+                                        <FaLocationDot />
+                                    </InputLeftElement>
+                                    <Input color={textColor} bg={color} placeholder='Search by Location' _placeholder={{ color: { placeholderColor } }} type="text" value={location} onChange={(e) => setLocationFromFilter(e.target.value)} />
+                                </InputGroup>
 
-                            {/* Button to filter or reset filter */}
-                            <ButtonGroup isAttached variant='outline'>
-                                <Button color={textColor} onClick={() => sendDataToParent(name, location, afterDate, beforeDate)}>Filter</Button>
-                                <IconButton onClick={clearFilters} icon={<TiDeleteOutline />} />
-                            </ButtonGroup>
-                        </HStack>
-                    </FormControl>
+                                {/* Name part of filter */}
+                                <InputGroup>
+                                    <InputLeftElement>
+                                        <FaMagnifyingGlass />
+                                    </InputLeftElement>
+                                    <Input color={textColor} bg={color} placeholder='Search by Name' _placeholder={{ color: { placeholderColor } }} type="text" value={name} onChange={(e) => setNameFromFilter(e.target.value)} />
+                                </InputGroup>
+
+                                {/* Button to filter or reset filter */}
+                                <ButtonGroup isAttached variant='outline'>
+                                    <Button color={textColor} onClick={handleClick}>Filter</Button>
+                                    <IconButton onClick={clearFilters} icon={<TiDeleteOutline />} />
+                                </ButtonGroup>
+                            </HStack>
+                        </FormControl>
+
+                    </HStack>
+
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>

@@ -10,24 +10,26 @@ function EventsPage() {
   const [location, setLocationFromFilter] = useState("");
   const [afterDate, setAfterDateFromFilter] = useState("");
   const [beforeDate, setBeforeDateFromFilter] = useState("");
+  const [category, setCategoryFromFilter] = useState("");
 
   // Helper function to update states of each event attribute
-  function handleDataFromChild(name, location, afterDate, beforeDate) {
+  function handleDataFromChild(name, location, afterDate, beforeDate, category) {
     setNameFromFilter(name);
     setLocationFromFilter(location);
     setAfterDateFromFilter(afterDate);
     setBeforeDateFromFilter(beforeDate);
+    setCategoryFromFilter(category);
   }
 
   // Fetches the endpoint to refresh the page
   useEffect(() => {
-
-    fetch(`http://localhost:5000/events?name=${name}&location=${location}&afterDate=${afterDate}&beforeDate=${beforeDate}`)
+    console.log(category)
+    fetch(`http://localhost:5000/events?name=${name}&location=${location}&afterDate=${afterDate}&beforeDate=${beforeDate}&category=${category}`)
       .then(response => response.json())
       .then(setEvents)
       .catch(error => console.error('Error fetching events:', error));
 
-  }, [name, location, afterDate, beforeDate]);
+  }, [name, location, afterDate, beforeDate, category]);
 
   return (
     <Container maxW="container.xl" centerContent>
@@ -44,6 +46,7 @@ function EventsPage() {
             time={event.time}
             location={event.location}
             imageUrl={event.url}
+            category={event.category}
           />
         ))}
       </SimpleGrid>

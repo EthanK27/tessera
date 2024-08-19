@@ -6,7 +6,7 @@ function TicketsReserved({ resTickets }) {
 
     return (
         <Card p={5} bg={color}>
-            <TableContainer maxH='300px'>
+            <TableContainer overflowY='auto' maxH='250px'>
                 <Text fontWeight='bold' fontSize='2xl' >Tickets in Cart</Text>
                 <Table>
                     <Thead>

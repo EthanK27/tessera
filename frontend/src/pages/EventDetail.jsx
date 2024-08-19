@@ -36,6 +36,7 @@ function EventDetail() {
             time={event.time}
             location={event.location}
             imageUrl={event.url} 
+            category={event.category}
           />
         ))}
     </Box>

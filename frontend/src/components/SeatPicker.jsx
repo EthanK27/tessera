@@ -11,6 +11,8 @@ function SeatPicker({ event_id, user_id, priceCb }) {
   const [rows, setRows] = useState([]);
   var reserved = "";
 
+  
+
   // Grabs the data for the seats
   useEffect(() => {
     const fetchData = async () => {
@@ -61,73 +63,65 @@ function SeatPicker({ event_id, user_id, priceCb }) {
 
     setLoading(true);
 
-    try {
-      reserved = "true";
-      // Your custom logic to reserve the seat goes here...
-      fetch(`http://localhost:5000/inventory/reserve/${user_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          {
-            event_id: event_id,
-            row_name: row,
-            seat_number: number
-          }
-        ),
-        credentials: 'include',
-      })
-        .then(response => response.json())
-        .catch(error => console.error('Unable to reserve seat', error));
-      // debugger
-      
-      priceCb({ row, number, reserved });
-      // Assuming everything went well...
-      setSelected((prevItems) => [...prevItems, id]);
-      const updateTooltipValue = 'Added to cart';
+    reserved = "true";
+    // Your custom logic to reserve the seat goes here...
+    fetch(`http://localhost:5000/inventory/reserve/${user_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          event_id: event_id,
+          row_name: row,
+          seat_number: number
+        }
+      ),
+      credentials: 'include',
+    })
+      .then(response => {
 
-      // Important to call this function if the seat was successfully selected - it helps update the screen
-      addCb(row, number, id, updateTooltipValue);
-    } catch (error) {
-      // Handle any errors here
-      console.error('Error adding seat:', error);
-    } finally {
-      setLoading(false);
-    }
+        priceCb({ row, number, reserved });
+        // Assuming everything went well...
+        setSelected((prevItems) => [...prevItems, id]);
+        const updateTooltipValue = 'Added to cart';
+
+        // Important to call this function if the seat was successfully selected - it helps update the screen
+        addCb(row, number, id, updateTooltipValue);
+        setLoading(false);
+      })
+      .catch(error => console.error('Unable to reserve seat', error));
+    // debugger
   };
 
   const removeSeatCallback = async ({ row, number, id }, removeCb) => {
     setLoading(true);
     reserved = "false";
 
-    try {
-      fetch(`http://localhost:5000/inventory/unreserve`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          {
-            event_id: event_id,
-            row_name: row,
-            seat_number: number
-          }
-        ),
-        credentials: 'include',
+    fetch(`http://localhost:5000/inventory/unreserve`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+          event_id: event_id,
+          row_name: row,
+          seat_number: number
+        }
+      ),
+      credentials: 'include',
+    })
+      .then(response => {
+        setSelected((list) => list.filter((item) => item !== id));
+        removeCb(row, number);
+        priceCb({ row, number, reserved });
+        setLoading(false);
       })
-        .then(response => response.json())
-        .catch(error => console.error('Unable to unreserve seat', error));
+      .catch(error => console.error('Unable to unreserve seat', error));
 
-      setSelected((list) => list.filter((item) => item !== id));
-      removeCb(row, number);
-    } catch (error) {
-      // Handle any errors here
-      console.error('Error removing seat:', error);
-    } finally {
-      setLoading(false);
-    }
-    priceCb({ row, number, reserved });
+
+
   };
 
   return (
@@ -137,7 +131,7 @@ function SeatPicker({ event_id, user_id, priceCb }) {
         addSeatCallback={addSeatCallback}
         removeSeatCallback={removeSeatCallback}
         rows={rows}
-        maxReservableSeats={3}
+        maxReservableSeats={6}
         alpha
         visible
         loading={loading}

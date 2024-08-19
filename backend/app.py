@@ -19,7 +19,7 @@ from email.mime.text import MIMEText
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-app.config['JWT_SECRET_KEY'] = 'banana_pudding'
+app.config['JWT_SECRET_KEY'] = ''
 CORS(app, supports_credentials=True)
 jwt = JWTManager(app)
 
@@ -33,7 +33,7 @@ def get_db_connection():
 def send_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password =  ''
+    from_password = 'wgqd popm zsou ktbp'  
 
     # Setup the MIME
     msg = MIMEMultipart()
@@ -59,7 +59,7 @@ def send_email(to_email, subject, body):
 def send_password_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password = 'wgqd popm zsou ktbp'  
+    from_password = ''  
 
     # Setup the MIME
     msg = MIMEMultipart()
@@ -116,6 +116,12 @@ def get_events():
     if eventName:
       query_conditions.append('name = ?')
       params.append(eventName)
+
+    # Check for the 'category' filter
+    eventCategory = request.args.get('category')
+    if eventCategory:
+      query_conditions.append('category = ?')
+      params.append(eventCategory)
 
     # Add WHERE clause if conditions are present
     if query_conditions:
@@ -421,18 +427,19 @@ def create_event():
   event_date = request.json.get('event_date')
   event_description = request.json.get('event_description')
   event_url = request.json.get('event_url')
+  event_category = request.json.get('event_category')
 
   # Ensure all fields are put in
-  if not event_name or not event_location or not event_time or not event_date or not event_description or not event_url:
-    return jsonify({'error': 'All fields (name, description, location, time, date, and url) are required.'}), 400
+  if not event_name or not event_location or not event_time or not event_date or not event_description or not event_url or not event_category:
+    return jsonify({'error': 'All fields (name, description, location, time, date, url, and category) are required.'}), 400
   
   try:
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # Attempt to put new event into the table
-    cursor.execute('INSERT INTO Events (name, description, date, time, location, url) VALUES (?, ?, ?, ?, ?, ?)',
-                       (event_name, event_description, event_date, event_time, event_location, event_url))
+    cursor.execute('INSERT INTO Events (name, description, date, time, location, url, category) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                       (event_name, event_description, event_date, event_time, event_location, event_url, event_category))
     conn.commit()
 
     # Retrieve the event name of the newly created event to confirm creation
@@ -655,7 +662,7 @@ def reserve_ticket(user_id):
       if check_status['status'] == "AVAILABLE":
         cursor.execute('UPDATE Tickets SET status = ?, user_id = ? WHERE event_id = ? AND row_name = ? AND seat_number = ?', (status, user_id, event_id, row_name, seat_number,),)
         conn.commit()
-        countdown()
+        # countdown()
       else:
          return jsonify({'error': 'Ticket is unavailable'}), 401
 
