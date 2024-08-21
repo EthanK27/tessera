@@ -19,7 +19,7 @@ from email.mime.text import MIMEText
 
 app = Flask(__name__) # Creating a new Flask app. This will help us create API endpoints hiding the complexity of writing network code!
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-app.config['JWT_SECRET_KEY'] = ''
+app.config['JWT_SECRET_KEY'] = 'banana_pudding'
 CORS(app, supports_credentials=True)
 jwt = JWTManager(app)
 
@@ -33,7 +33,7 @@ def get_db_connection():
 def send_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password = 'wgqd popm zsou ktbp'  
+    from_password = ''  
 
     # Setup the MIME
     msg = MIMEMultipart()
@@ -59,7 +59,7 @@ def send_email(to_email, subject, body):
 def send_password_email(to_email, subject, body):
     # Gmail account credentials
     from_email = 'ekemprowspam@gmail.com'
-    from_password = ''  
+    from_password = 'wgqd popm zsou ktbp'  
 
     # Setup the MIME
     msg = MIMEMultipart()
@@ -285,6 +285,8 @@ def delete_user():
     if (found_user != None):
       if (check_password_hash(found_user['password_hash'], password)):
         cursor.execute('DELETE FROM Users WHERE username = ?', (username,))
+        #cursor.execute('UPDATE Tickets SET status = ?, user_id = ?, purchase_date = ? WHERE username = ?', ('AVAILABLE', None, None, username,),)
+
         conn.commit()
         conn.close()
         logout()
